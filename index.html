@@ -1,0 +1,2873 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Älgholm RP - Din Bloxburg Gemenskap</title>
+    <!-- Länka till Tailwind CSS CDN för enkel styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Länka till Font Awesome för ikoner -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Anpassad CSS för att säkerställa att modalen är centrerad och täcker skärmen */
+        .modal {
+            display: none; /* Dölj modalen som standard */
+            position: fixed;
+            z-index: 1000; /* Högre än andra element */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7); /* Mörk bakgrund */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        /* Specifik stil för modaler för att göra dem lite bredare */
+        #hotel-details-modal .modal-content,
+        #karlssons-ekonomi-modal .modal-content,
+        #karlssons-korskola-modal .modal-content,
+        #karlssons-juridik-modal .modal-content,
+        #din-advokat-modal .modal-content,
+        #house-rental-modal .modal-content,
+        #message-send-modal .modal-content,
+        #job-post-modal .modal-content,
+        #rp-session-create-modal .modal-content,
+        #news-create-modal .modal-content,
+        #job-detail-modal .modal-content,
+        #housing-detail-modal .modal-content,
+        #rp-session-detail-modal .modal-content,
+        #news-detail-modal .modal-content,
+        #emporia-details-modal .modal-content,
+        #admin-message-log-modal .modal-content,
+        #admin-user-management-modal .modal-content, /* Ny för admin användarhantering */
+        #sjukvard-modal .modal-content, /* Ny för sjukvårdssidan */
+        #polis-modal .modal-content, /* Ny för polissidan */
+        #borgmastare-modal .modal-content, /* Ny för borgmästarsidan */
+        #korskola-modal .modal-content, /* Ny för körskolesidan */
+        #confirmation-modal .modal-content /* Ny för bekräftelsemodal */
+        {
+            max-width: 700px; /* Gör modalerna bredare */
+        }
+        /* Stil för notisrutan */
+        #notification-modal {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100; /* Högre än andra modaler */
+            background-color: #4CAF50; /* Grön bakgrund */
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: fadeInOut 8s forwards; /* Animation för att tona in och ut */
+            max-width: 300px;
+            cursor: pointer;
+        }
+        #notification-modal.error {
+            background-color: #f44336; /* Röd bakgrund för fel */
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            cursor: pointer;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            background-color: #2b6cb0; /* Custom Blue-700 */
+            color: white;
+        }
+        .section {
+            display: none; /* Dölj alla sektioner som standard */
+        }
+        .section.active {
+            display: block; /* Visa den aktiva sektionen */
+        }
+        .message-item {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .message-item.unread {
+            background-color: #fffbeb; /* Ljusgul för olästa */
+            border-color: #fcd34d; /* Gul kant */
+            font-weight: bold;
+        }
+        .dynamic-card {
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out;
+        }
+        .dynamic-card:hover {
+            transform: translateY(-5px);
+        }
+        .dynamic-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .dynamic-card-content {
+            padding: 1.5rem;
+        }
+        .dynamic-card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c5282; /* Custom Blue-800 */
+            margin-bottom: 0.5rem;
+        }
+        .dynamic-card-description {
+            color: #4b5563; /* Gray-700 */
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        .dynamic-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1.5rem 1.5rem;
+        }
+        .role-content-section {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f0f9ff;
+            border-radius: 0.5rem;
+            border: 1px solid #bfdbfe;
+        }
+        .role-content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-blue-200 font-sans text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Navigationsfält -->
+    <nav class="bg-blue-800 p-4 shadow-lg">
+        <div class="container mx-auto flex flex-wrap justify-between items-center">
+            <a href="#" id="home-link" class="text-white text-3xl font-bold rounded-lg px-3 py-1 hover:bg-blue-700 transition-colors">
+                <img src="mkk.jpg" alt="Älgholm Kommun Logga" class="h-10 inline-block mr-2"> Älgholm RP
+            </a>
+            <div class="block lg:hidden">
+                <button id="nav-toggle" class="flex items-center px-3 py-2 border rounded text-blue-200 border-blue-400 hover:text-white hover:border-white">
+                    <svg class="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><title>Menu</title><path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v15z"/></svg>
+                </button>
+            </div>
+            <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden" id="nav-content">
+                <ul class="text-lg lg:flex justify-end flex-1 items-center">
+                    <li><a href="#" data-section="home" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Startsida</a></li>
+                    <li><a href="#" data-section="housing" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Hitta Bostäder</a></li>
+                    <li><a href="#" data-section="jobs" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Sök Jobb</a></li>
+                    <li><a href="#" data-section="rp-sessions" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">RP-sessioner</a></li>
+                    <li><a href="#" data-section="news-channel" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Nyhetskanal</a></li>
+                    <li><a href="#" data-section="businesses" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Företag</a></li>
+                    <li><a href="#" data-section="municipality" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-6 p-2 rounded-md transition-colors">Kommunen</a></li>
+                    <li><button id="login-button" class="bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-bold py-2 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 mt-4 lg:mt-0">Logga in / Skapa konto</button></li>
+                    <li id="my-algholm-nav-item" class="hidden"><a href="#" data-section="my-algholm" class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white ml-6 p-2 rounded-md transition-colors bg-blue-700">Mitt Älgholm</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Huvudinnehåll -->
+    <main class="container mx-auto p-6 flex-grow">
+
+        <!-- Startsida -->
+        <section id="home-section" class="section active bg-white p-8 rounded-xl shadow-xl mb-8">
+            <h1 class="text-5xl font-extrabold text-blue-800 mb-6 text-center">Välkommen till Älgholm!</h1>
+            <p class="text-lg text-gray-700 mb-6 leading-relaxed text-center">
+                Upptäck en levande och dynamisk rollspelsvärld i Bloxburg, Roblox. Älgholm är staden där dina drömmar kan bli verklighet! Här kan du hitta ditt perfekta hem, starta en karriär, utforska lokala företag och bli en del av vår växande gemenskap.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8 mt-10">
+                <div class="bg-blue-50 p-6 rounded-lg shadow-md flex items-center space-x-4">
+                    <i class="fas fa-house-user text-4xl text-blue-600"></i>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-2">Hitta ditt drömhem</h3>
+                        <p class="text-gray-600">Utforska lägenheter, hotell och unika bostäder som passar din karaktärs stil och budget.</p>
+                    </div>
+                </div>
+                <div class="bg-green-50 p-6 rounded-lg shadow-md flex items-center space-x-4">
+                    <i class="fas fa-briefcase text-4xl text-green-600"></i>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-green-800 mb-2">Bygg din karriär</h3>
+                        <p class="text-gray-600">Sök spännande jobb inom sjukvård, utbildning, polisväsende och mer!</p>
+                    </div>
+                </div>
+                <div class="bg-yellow-50 p-6 rounded-lg shadow-md flex items-center space-x-4">
+                    <i class="fas fa-building text-4xl text-yellow-600"></i>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-yellow-800 mb-2">Upptäck lokala företag</h3>
+                        <p class="text-gray-600">Från körskolor till advokatbyråer – Älgholm har allt du behöver.</p>
+                    </div>
+                </div>
+                <div class="bg-blue-50 p-6 rounded-lg shadow-md flex items-center space-x-4">
+                    <i class="fas fa-school text-4xl text-blue-600"></i>
+                    <div>
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-2">Regnbågsskolan</h3>
+                        <p class="text-gray-600">Lär dig och växa i vår prestigefyllda skola för alla åldrar.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-10">
+                <button id="home-login-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-full text-xl shadow-xl transition-all duration-300 transform hover:scale-105">
+                    Bli en del av Älgholm idag! Logga in / Skapa konto
+                </button>
+            </div>
+        </section>
+
+        <!-- Mitt Älgholm Sektion (Synlig efter inloggning) -->
+        <section id="my-algholm-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Mitt Älgholm</h2>
+            <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+                <div class="w-48 h-48 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden shadow-lg">
+                    <img id="profile-picture-display" src="https://placehold.co/192x192/cccccc/333333?text=Profilbild" alt="Profilbild" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/192x192/cccccc/333333?text=Bild+saknas';">
+                </div>
+                <div class="flex-grow text-center md:text-left">
+                    <p class="text-2xl font-bold text-gray-900 mb-2"><span id="character-name-display"></span></p>
+                    <p class="text-lg text-gray-700 mb-1">Personnummer: <span id="personal-number-display" class="font-mono text-blue-700"></span></p>
+                    <p class="text-lg text-gray-700 mb-1">Discord: <span id="discord-name-display"></span></p>
+                    <p class="text-lg text-gray-700 mb-1">Karaktärstyp: <span id="character-type-display"></span></p>
+                    <p class="text-lg text-gray-700 mb-4">Drömjobb: <span id="dream-job-display"></span></p>
+                    <p class="text-lg text-gray-700 mb-4">Roll: <span id="user-role-display" class="font-semibold text-purple-700"></span></p>
+
+
+                    <button id="upload-profile-pic-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-camera mr-2"></i>Ladda upp profilbild
+                    </button>
+                    <input type="file" id="profile-picture-input" accept="image/*" class="hidden">
+                </div>
+            </div>
+            <div class="mt-8 border-t pt-6 border-gray-200">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Mina Aktiviteter</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li><i class="fas fa-home mr-2 text-blue-500"></i>Nuvarande Bostad: <span id="current-housing-display">Ingen bostad vald</span></li>
+                    <li><i class="fas fa-briefcase mr-2 text-blue-500"></i>Nuvarande Jobb: <span id="current-job-display">Inget jobb valt</span></li>
+                    <li><i class="fas fa-calendar-alt mr-2 text-blue-500"></i>Kommande Evenemang: Inga just nu</li>
+                </ul>
+            </div>
+
+            <div class="mt-8 border-t pt-6 border-gray-200">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Mina Meddelanden (<span id="unread-messages-count">0</span> olästa)</h3>
+                <div id="messages-list" class="space-y-3">
+                    <!-- Meddelanden kommer att laddas här med JavaScript -->
+                    <p class="text-gray-500" id="no-messages-text">Inga meddelanden än.</p>
+                </div>
+                <button id="mark-all-read-button" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 mt-4 hidden">
+                    Markera alla som lästa
+                </button>
+                <button id="view-admin-messages-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 mt-4 hidden">
+                    <i class="fas fa-shield-alt mr-2"></i>Visa alla meddelanden (Admin)
+                </button>
+                <button id="open-admin-user-management-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 mt-4 hidden">
+                    <i class="fas fa-users-cog mr-2"></i>Hantera Användare (Admin)
+                </button>
+            </div>
+
+            <div class="mt-8 border-t pt-6 border-gray-200" id="role-specific-buttons-container">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Mina Roll-specifika Verktyg</h3>
+                <!-- Roll-specifika knappar laddas här med JavaScript -->
+            </div>
+
+
+            <div class="mt-8 text-center space-x-4">
+                <button id="send-message-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-envelope mr-2"></i>Meddela
+                </button>
+                <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+                    Logga ut
+                </button>
+            </div>
+        </section>
+
+        <!-- Hitta Bostäder Sektion -->
+        <section id="housing-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Hitta Bostäder i Älgholm</h2>
+            <p class="text-lg text-gray-700 mb-8 text-center">Utforska de olika boendemöjligheterna i vår stad. Oavsett om du söker en mysig lägenhet eller ett lyxigt hotellrum, har Älgholm något för dig!</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Statisk Central Lägenhet -->
+                <div class="bg-blue-50 rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
+                    <img src="https://placehold.co/400x250/a78bfa/ffffff?text=Lägenhet" alt="Lägenhet i Älgholm" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Bild+saknas';">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold text-blue-800 mb-2">Central Lägenhet</h3>
+                        <p class="text-gray-700 mb-4">En modern lägenhet i hjärtat av Älgholm, perfekt för singlar eller par. Nära till allt!</p>
+                        <ul class="text-gray-600 text-sm mb-4 space-y-1">
+                            <li><i class="fas fa-bed mr-2 text-blue-500"></i>1 Sovrum</li>
+                            <li><i class="fas fa-bath mr-2 text-blue-500"></i>1 Badrum</li>
+                            <li><i class="fas fa-ruler-combined mr-2 text-blue-500"></i>60 kvm</li>
+                        </ul>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xl font-bold text-blue-700">5,000 kr/mån</span>
+                            <button id="open-central-apartment-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statisk Hotell Exempel -->
+                <div class="bg-yellow-50 rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
+                    <img src="https://placehold.co/400x250/fcd34d/ffffff?text=Hotellrum" alt="Hotellrum i Älgholm" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Bild+saknas';">
+                    <div class="p-6">
+                        <h3 class="text-2xl font-semibold text-yellow-800 mb-2">Grand Hotell Älgholm</h3>
+                        <p class="text-gray-700 mb-4">Lyxiga hotellrum för kortare eller längre vistelser. Inkluderar frukost och tillgång till gym.</p>
+                        <ul class="text-gray-600 text-sm mb-4 space-y-1">
+                            <li><i class="fas fa-bed mr-2 text-yellow-500"></i>Dubbelrum</li>
+                            <li><i class="fas fa-bath mr-2 text-yellow-500"></i>Eget badrum</li>
+                            <li><i class="fas fa-concierge-bell mr-2 text-yellow-500"></i>Rumsservice</li>
+                        </ul>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xl font-bold text-yellow-700">800 kr/natt</span>
+                            <button id="open-hotel-details-button" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Behållare för dynamiska husannonser -->
+                <div id="dynamic-housing-listings-container" class="contents">
+                    <!-- Dynamiska husannonser kommer att laddas här med JavaScript -->
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <button id="open-house-rental-button" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300">
+                    <i class="fas fa-plus mr-2"></i>Lägg ut egen annons
+                </button>
+            </div>
+        </section>
+
+        <!-- Regnbågsskolan Sektion -->
+        <section id="school-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Regnbågsskolan</h2>
+            <p class="text-lg text-gray-700 mb-8 text-center">
+                Välkommen till Regnbågsskolan, Älgholms ledande institution för lärande och utveckling! Vi erbjuder en stimulerande miljö där varje elev kan blomstra.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Vår Vision</h3>
+                    <p class="text-gray-700 mb-4">
+                        På Regnbågsskolan strävar vi efter att ge våra elever de bästa förutsättningarna för framgång, både akademiskt och personligt. Vi fokuserar på kreativitet, kritiskt tänkande och samarbete.
+                    </p>
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Kurser och Program</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><i class="fas fa-book-open mr-2 text-blue-500"></i>Grundläggande Ämnen (Matte, Svenska, Engelska)</li>
+                        <li><i class="fas fa-palette mr-2 text-blue-500"></i>Konst och Kreativitet</li>
+                        <li><i class="fas fa-flask mr-2 text-blue-500"></i>Naturvetenskap och Teknik</li>
+                        <li><i class="fas fa-music mr-2 text-blue-500"></i>Musik och Drama</li>
+                        <li><i class="fas fa-running mr-2 text-blue-500"></i>Idrott och Hälsa</li>
+                    </ul>
+                </div>
+                <div>
+                    <Image of Regnbågsskolan>
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Vår Personal</h3>
+                    <p class="text-gray-700">
+                        Vårt team av engagerade lärare och personal är dedikerade till att skapa en trygg och inspirerande lärmiljö. Vi ser fram emot att välkomna dig!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sök Jobb Sektion -->
+        <section id="jobs-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Sök Jobb i Älgholm</h2>
+            <p class="text-lg text-gray-700 mb-8 text-center">Älgholm erbjuder en mängd karriärmöjligheter. Hitta ditt drömjobb nedan och skicka in din ansökan!</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="job-listings-container">
+                <!-- Dynamiska jobbannonser kommer att laddas här -->
+            </div>
+            <div class="text-center mt-8">
+                <button id="open-job-post-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300">
+                    <i class="fas fa-plus mr-2"></i>Lägg ut jobbannons
+                </button>
+            </div>
+        </section>
+
+        <!-- RP-sessioner Sektion -->
+        <section id="rp-sessions-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">RP-sessioner i Älgholm</h2>
+            <p class="text-lg text-gray-700 mb-8 text-center">Här kan du hitta och anmäla dig till kommande rollspelsessioner, eller skapa egna!</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="rp-sessions-listings-container">
+                <!-- Dynamiska RP-sessioner kommer att laddas här -->
+            </div>
+            <div class="text-center mt-8">
+                <button id="open-rp-session-create-button" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300">
+                    <i class="fas fa-plus mr-2"></i>Skapa ny RP-session
+                </button>
+            </div>
+        </section>
+
+        <!-- Nyhetskanal Sektion -->
+        <section id="news-channel-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Älgholms Nyhetskanal</h2>
+            <p class="text-lg text-gray-700 mb-8 text-center">Håll dig uppdaterad med de senaste händelserna och nyheterna från Älgholm!</p>
+
+            <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-8" id="news-articles-container">
+                <!-- Dynamiska nyhetsartiklar kommer att laddas här -->
+            </div>
+            <div class="text-center mt-8">
+                <button id="open-news-create-button" class="bg-yellow-600 hover:bg-yellow-700 text-blue-900 font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300">
+                    <i class="fas fa-plus mr-2"></i>Skapa nyhet
+                </button>
+            </div>
+        </section>
+
+
+        <!-- Företag Sektion (oförändrad) -->
+        <section id="businesses-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Företag i Älgholm</h2>
+            <p class="text-lg text-gray-700 mb-8 text-center">Älgholm är hem för en blomstrande företagsgemenskap. Här är några av de ledande företagen i staden:</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Karlssons Körskola -->
+                <div class="bg-green-50 rounded-lg shadow-md p-6 transform transition-transform hover:scale-105">
+                    <i class="fas fa-car text-5xl text-green-600 mb-4"></i>
+                    <h3 class="text-2xl font-semibold text-green-800 mb-2">Karlssons Körskola</h3>
+                    <p class="text-gray-700 mb-4">Ta ditt körkort i Älgholm med Karlssons Körskola. Erfarna instruktörer och moderna fordon.</p>
+                    <button id="open-karlssons-korskola-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+                </div>
+                <!-- Karlssons Ekonomihantering -->
+                <div class="bg-yellow-50 rounded-lg shadow-md p-6 transform transition-transform hover:scale-105">
+                    <i class="fas fa-chart-line text-5xl text-yellow-600 mb-4"></i>
+                    <h3 class="text-2xl font-semibold text-yellow-800 mb-2">Karlssons Ekonomihantering</h3>
+                    <p class="text-gray-700 mb-4">Professionell hjälp med din ekonomi, bokföring och finansiell rådgivning för privatpersoner och företag.</p>
+                    <button id="open-karlssons-ekonomi-button" class="bg-yellow-600 hover:bg-yellow-700 text-blue-900 font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+                </div>
+                <!-- Karlssons Juridik -->
+                <div class="bg-blue-50 rounded-lg shadow-md p-6 transform transition-transform hover:scale-105">
+                    <i class="fas fa-gavel text-5xl text-blue-600 mb-4"></i>
+                    <h3 class="text-2xl font-semibold text-blue-800 mb-2">Karlssons Juridik</h3>
+                    <p class="text-gray-700 mb-4">Experter på juridiska frågor. Få rådgivning och representation inom alla rättsområden.</p>
+                    <button id="open-karlssons-juridik-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+                </div>
+                <!-- Din Advokat -->
+                <div class="bg-red-50 rounded-lg shadow-md p-6 transform transition-transform hover:scale-105">
+                    <i class="fas fa-balance-scale text-5xl text-red-600 mb-4"></i>
+                    <h3 class="text-2xl font-semibold text-red-800 mb-2">Din Advokat</h3>
+                    <p class="text-gray-700 mb-4">Personlig och pålitlig juridisk hjälp. Vi står vid din sida i alla juridiska processer.</p>
+                    <button id="open-din-advokat-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Kommunen Sektion (oförändrad) -->
+        <section id="municipality-section" class="section bg-white p-8 rounded-xl shadow-xl mb-8">
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-6 text-center">Älgholms Kommun</h2>
+            <p class="text-lg text-gray-700 mb-8 text-center">
+                Älgholms kommun arbetar för att skapa en trygg, trivsam och välfungerande stad för alla invånare. Här hittar du viktig information om stadens tjänster och styrning.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Våra Tjänster</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-2">
+                        <li><i class="fas fa-city mr-2 text-blue-500"></i>Bygglov och Stadsplanering</li>
+                        <li><i class="fas fa-hands-helping mr-2 text-blue-500"></i>Socialtjänst och Stöd</li>
+                        <li><i class="fas fa-road mr-2 text-blue-500"></i>Vägar och Infrastruktur</li>
+                        <li><i class="fas fa-lightbulb mr-2 text-blue-500"></i>Energi och Miljö</li>
+                        <li><i class="fas fa-fire-extinguisher mr-2 text-blue-500"></i>Räddningstjänst</li>
+                    </ul>
+                    <button id="open-school-from-municipality-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 mt-6">
+                        <i class="fas fa-school mr-2"></i>Skola
+                    </button>
+                    <button id="open-emporia-button" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 mt-4">
+                        <i class="fas fa-shopping-basket mr-2"></i>Emporia Köpcentrum
+                    </button>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-blue-700 mb-4">Kontakt och Öppettider</h3>
+                    <p class="text-gray-700 mb-2"><i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>Älgholms Stadshus, Storgatan 1, Älgholm</p>
+                    <p class="text-gray-700 mb-2"><i class="fas fa-phone mr-2 text-blue-500"></i>Telefon: 070-123 45 67 (RP-nummer)</p>
+                    <p class="text-gray-700 mb-2"><i class="fas fa-envelope mr-2 text-blue-500"></i>E-post: info@algholm.rp</p>
+                    <p class="text-gray-700"><i class="fas fa-clock mr-2 text-blue-500"></i>Öppettider: Mån-Fre 09:00-16:00</p>
+                </div>
+            </div>
+            <div class="mt-8">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Lokala Nyheter och Evenemang</h3>
+                <p class="text-gray-700">Håll dig uppdaterad med de senaste nyheterna och kommande evenemangen i Älgholm via vår kommunala anslagstavla (kommer snart!).</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white p-6 text-center shadow-inner mt-auto">
+        <div class="container mx-auto">
+            <p>&copy; 2025 Älgholm RP. Alla rättigheter reserverade.</p>
+            <p class="text-sm mt-2">En inofficiell Bloxburg RP-gemenskap.</p>
+        </div>
+    </footer>
+
+    <!-- Logga in / Skapa konto Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Välkommen till Älgholm</h2>
+
+            <div class="flex justify-center mb-6">
+                <button id="login-tab-button" class="tab-button active bg-blue-700 text-white py-2 px-6 rounded-l-full font-semibold transition-colors duration-200">Logga in</button>
+                <button id="register-tab-button" class="tab-button bg-gray-200 text-gray-700 py-2 px-6 rounded-r-full font-semibold transition-colors duration-200">Skapa konto</button>
+            </div>
+
+            <!-- Logga in Form -->
+            <div id="login-form-container">
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="login-personal-number" class="block text-gray-700 text-sm font-bold mb-2">Personnummer:</label>
+                        <input type="text" id="login-personal-number" name="personalNumber" placeholder="Ditt personnummer" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">Logga in</button>
+                </form>
+            </div>
+
+            <!-- Skapa konto Form -->
+            <div id="register-form-container" class="hidden">
+                <form id="register-form" class="space-y-4">
+                    <div>
+                        <label for="character-name" class="block text-gray-700 text-sm font-bold mb-2">Karaktärsnamn:</label>
+                        <input type="text" id="character-name" name="characterName" placeholder="T.ex. Anna Svensson" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="discord-name" class="block text-gray-700 text-sm font-bold mb-2">Discord Namn:</label>
+                        <input type="text" id="discord-name" name="discordName" placeholder="T.ex. Användarnamn#1234" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="character-type" class="block text-gray-700 text-sm font-bold mb-2">Vilken typ av person är din karaktär?</label>
+                        <textarea id="character-type" name="characterType" rows="3" placeholder="T.ex. En glad och utåtriktad person som älskar att hjälpa andra..." class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                    </div>
+                    <div>
+                        <label for="dream-job" class="block text-gray-700 text-sm font-bold mb-2">Vad är din karaktärs drömjobb?</label>
+                        <input type="text" id="dream-job" name="dreamJob" placeholder="T.ex. Polis eller lärare" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">Skapa karaktär</button>
+                </form>
+            </div>
+
+            <!-- Meddelanderuta (istället för alert) -->
+            <div id="message-box" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4" role="alert">
+                <strong class="font-bold">Framgång!</strong>
+                <span class="block sm:inline" id="message-text"></span>
+                <span class="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onclick="document.getElementById('message-box').classList.add('hidden');">
+                    <svg class="fill-current h-6 w-6 text-green-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Stäng</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697L11.819 10l3.03 2.651a1.2 1.2 0 0 1 0 1.698z"/></svg>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grand Hotell Detaljmodal -->
+    <div id="hotel-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-hotel-details-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Grand Hotell Älgholm - Mer Info</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-2xl font-semibold text-yellow-800 mb-3">Restaurangens Öppettider</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li><i class="fas fa-utensils mr-2 text-yellow-600"></i>Frukost: 05:00-10:00</li>
+                        <li><i class="fas fa-utensils mr-2 text-yellow-600"></i>Lunch: 12:00-15:00</li>
+                        <li><i class="fas fa-utensils mr-2 text-yellow-600"></i>Middag: 16:00-21:00</li>
+                        <li><i class="fas fa-coffee mr-2 text-yellow-600"></i>Nattfika: 22:00-04:30</li>
+                    </ul>
+
+                    <h3 class="text-2xl font-semibold text-yellow-800 mb-3 mt-6">Gymmets Öppettider</h3>
+                    <p class="text-gray-700"><i class="fas fa-dumbbell mr-2 text-yellow-600"></i>Öppet 24/7</p>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold text-yellow-800 mb-3">Prislista - Rum & Sviter</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li><i class="fas fa-bed mr-2 text-yellow-600"></i>Enkelrum för 2: 350 kr/natten</li>
+                        <li><i class="fas fa-bed mr-2 text-yellow-600"></i>Enkelrum för 2 + balkong: 500 kr/natten</li>
+                        <li><i class="fas fa-home mr-2 text-yellow-600"></i>Eventhuset för 4: 850 kr/natten</li>
+                        <li><i class="fas fa-crown mr-2 text-yellow-600"></i>Prinsessan Lilia sviten för 2 + balkong: 950 kr/natten</li>
+                        <li><i class="fas fa-user-tie mr-2 text-yellow-600"></i>President sviten för 4 + eget kök: 1 500 kr/natten</li>
+                    </ul>
+
+                    <h3 class="text-2xl font-semibold text-yellow-800 mb-3 mt-6">Tilläggstjänster</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li><i class="fas fa-bread-slice mr-2 text-yellow-600"></i>Frukost: 150 kr/person</li>
+                        <li><i class="fas fa-hamburger mr-2 text-yellow-600"></i>Lunch: 150 kr/person</li>
+                        <li><i class="fas fa-pizza-slice mr-2 text-yellow-600"></i>Middag: 200 kr/person</li>
+                        <li><i class="fas fa-cookie-bite mr-2 text-yellow-600"></i>Nattfika: Ingår för alla rum</li>
+                    </ul>
+
+                    <h3 class="text-2xl font-semibold text-yellow-800 mb-3 mt-6">Faciliteter</h3>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li><i class="fas fa-dumbbell mr-2 text-yellow-600"></i>Gym: Ingår för gäster, annars 150 kr/dag eller 900 kr/vecka</li>
+                        <li><i class="fas fa-spa mr-2 text-yellow-600"></i>Spa: Ingår för Prinsessan Lilia & President sviten, 350 kr/person för andra gäster, 500 kr/person för externa besökare</li>
+                        <li><i class="fas fa-swimming-pool mr-2 text-yellow-600"></i>Badområde: Ingår för gäster, annars 250 kr/person</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Karlssons Ekonomihantering Detaljmodal (oförändrad) -->
+    <div id="karlssons-ekonomi-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-karlssons-ekonomi-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Karlssons Ekonomihantering - Mer Info</h2>
+            <p class="text-gray-700 mb-4">Karlssons Ekonomihantering erbjuder personlig och kompetent hjälp inom försäkringar, lån och privatekonomisk rådgivning. Vårt mål är att göra ekonomiska beslut enklare, tryggare och mer långsiktigt hållbara för dig som privatperson eller småföretagare.</p>
+            <h3 class="text-2xl font-semibold text-green-800 mb-3 mt-6">Vi arbetar med:</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li><i class="fas fa-shield-alt mr-2 text-green-600"></i><strong>Försäkringsrådgivning:</strong> Vi hjälper dig att jämföra och välja rätt försäkringar utifrån dina behov, oavsett om det gäller hem, fordon, liv eller företag.</li>
+                <li><i class="fas fa-money-bill-wave mr-2 text-green-600"></i><strong>Lånehantering:</strong> Oavsett om du står inför ett bostadsköp, behöver samla lån eller se över dina befintliga villkor, ser vi till att du får en lösning som är anpassad efter din ekonomi.</li>
+                <li><i class="fas fa-chart-pie mr-2 text-green-600"></i><strong>Ekonomisk rådgivning:</strong> Vi erbjuder stöd och struktur i din vardagsekonomi: budget, sparande, skuldsanering, ekonomiska omstarter eller planering för framtiden.</li>
+            </ul>
+            <p class="text-gray-700 mt-4">Vår rådgivning präglas av diskretion, professionalism och ett starkt engagemang i varje individs ekonomiska situation. Vi förklarar det krångliga på ett sätt som är lätt att förstå – och finns med dig hela vägen mot en stabilare och tryggare ekonomisk tillvaro.</p>
+        </div>
+    </div>
+
+    <!-- Karlssons Körskola Detaljmodal (oförändrad) -->
+    <div id="karlssons-korskola-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-karlssons-korskola-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Karlssons Körskola - Mer Info</h2>
+            <p class="text-gray-700 mb-4">På Karlssons Körskola får du en körkortsutbildning som kombinerar kompetens, trygghet och pedagogik. Med moderna utbildningsmetoder och erfarna trafiklärare hjälper vi dig att nå ditt mål – ett körkort och en säker framtid i trafiken.</p>
+            <p class="text-gray-700 mb-4">Vi utbildar både privatpersoner och företag och anpassar varje kurs efter dina behov, förkunskaper och mål.</p>
+
+            <h3 class="text-2xl font-semibold text-green-800 mb-3 mt-6">Vi erbjuder körkortsutbildningar för:</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg shadow-md">
+                    <thead>
+                        <tr class="bg-green-100 text-green-800 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">Tjänst</th>
+                            <th class="py-3 px-6 text-left">Pris</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700 text-sm font-light">
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">Körlektion (40 min)</td>
+                            <td class="py-3 px-6 text-left">650 kr</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">Körlektion (80 min)</td>
+                            <td class="py-3 px-6 text-left">1 250 kr</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">Teoripaket (bok + digital plattform)</td>
+                            <td class="py-3 px-6 text-left">1 495 kr</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">Riskettan (del 1)</td>
+                            <td class="py-3 px-6 text-left">950 kr</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">Risktvåan (halkbana)</td>
+                            <td class="py-3 px-6 text-left">2 300 kr</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">Handledarkurs (3 pers max)</td>
+                            <td class="py-3 px-6 text-left">950 kr/person</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">Uppvärmningslektion + lån av bil vid uppkörning</td>
+                            <td class="py-3 px-6 text-left">1 800 kr</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">AM-utbildning (Moped klass I)</td>
+                            <td class="py-3 px-6 text-left">5 900 kr</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">BE-körkort (paketpris)</td>
+                            <td class="py-3 px-6 text-left">6 990 kr</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">Intensivkurs (B-körkort, 2 veckor)</td>
+                            <td class="py-3 px-6 text-left">från 18 900 kr</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">MC-lektion (60 min)</td>
+                            <td class="py-3 px-6 text-left">890 kr</td>
+                        </tr>
+                        <tr class="hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">A1/A2/A – MC-paket (teori + 10 körlektioner + risk)</td>
+                            <td class="py-3 px-6 text-left">från 15 500 kr</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-gray-700 mt-4">Vi erbjuder även räntefri delbetalning via samarbetspartner. Kontakta oss för individuell plan.</p>
+
+            <h3 class="text-2xl font-semibold text-green-800 mb-3 mt-6">Varför välja Karlssons Körskola?</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li><i class="fas fa-check-circle mr-2 text-green-600"></i>Erfarna och pedagogiska lärare</li>
+                <li><i class="fas fa-check-circle mr-2 text-green-600"></i>Hög godkännandefrekvens på uppkörningar</li>
+                <li><i class="fas fa-check-circle mr-2 text-green-600"></i>Trygga, välskötta fordon för alla behörigheter</li>
+                <li><i class="fas fa-check-circle mr-2 text-green-600"></i>Flexibla tider, även kvällar och helger</li>
+                <li><i class="fas fa-check-circle mr-2 text-green-600"></i>Löpande feedback och individuell utbildningsplan</li>
+                <li><i class="fas fa-check-circle mr-2 text-green-600"></i>Möjlighet till körning på flera språk</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Karlssons Juridik Detaljmodal (oförändrad) -->
+    <div id="karlssons-juridik-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-karlssons-juridik-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Karlssons Juridik - Mer Info</h2>
+            <p class="text-gray-700 mb-4">Karlssons Juridik är en kvalificerad och engagerad advokatbyrå som erbjuder juridisk rådgivning och professionellt biträde inom flera rättsområden – för både privatpersoner och företag. Med integritet, kompetens och ett klientfokuserat arbetssätt tar vi ansvar genom hela den juridiska processen.</p>
+
+            <h3 class="text-2xl font-semibold text-blue-800 mb-3 mt-6">Vi har särskild erfarenhet inom följande områden:</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li><i class="fas fa-balance-scale mr-2 text-blue-600"></i><strong>Brottmål:</strong> Vi företräder klienter som är misstänkta eller åtalade för brott och åtar oss uppdrag som både offentlig och privat försvarare. Vi säkerställer att dina rättigheter tas tillvara genom hela rättsprocessen – från förundersökning till domstolsförhandling.</li>
+                <li><i class="fas fa-users mr-2 text-blue-600"></i><strong>Familjerätt:</strong> Vårdnadstvister, bodelningar, äktenskapsförord, testamente och samboavtal.</li>
+                <li><i class="fas fa-file-contract mr-2 text-blue-600"></i><strong>Avtalsrätt och tvistelösning:</strong> Rådgivning, upprättande och tolkning av avtal samt representation vid tvister.</li>
+                <li><i class="fas fa-building mr-2 text-blue-600"></i><strong>Fastighets- och hyresrätt:</strong> För såväl fastighetsägare som privatpersoner.</li>
+                <li><i class="fas fa-briefcase mr-2 text-blue-600"></i><strong>Arbetsrätt:</strong> Biträde vid uppsägningar, anställningsavtal och arbetsrättsliga tvister.</li>
+            </ul>
+            <p class="text-gray-700 mt-4">Vår målsättning är alltid densamma: att leverera juridiska lösningar med hög kvalitet, tydlig kommunikation och fullt engagemang. Hos Karlssons Juridik möts du av ett professionellt bemötande, starkt rättsligt stöd och ett genuint intresse för din sak.</p>
+        </div>
+    </div>
+
+    <!-- Din Advokat Detaljmodal (oförändrad) -->
+    <div id="din-advokat-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-din-advokat-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Din Advokat - Mer Info</h2>
+            <p class="text-gray-700 mb-4">Din Advokat är en engagerad och pålitlig advokatbyrå som erbjuder kvalificerad juridisk rådgivning och rättsligt biträde för både privatpersoner och företag. Vår målsättning är att alltid stå vid din sida – med juridisk spetskompetens, lyhördhet och fullt fokus på ditt bästa.</p>
+
+            <h3 class="text-2xl font-semibold text-blue-800 mb-3 mt-6">Våra tjänsteområden:</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li><i class="fas fa-gavel mr-2 text-blue-600"></i><strong>Brottmål:</strong> Vi företräder såväl misstänkta som målsägande med starkt engagemang och stor respekt för dina rättigheter.</li>
+                <li><i class="fas fa-handshake mr-2 text-blue-600"></i><strong>Familjerätt:</strong> Hjälp vid vårdnadstvister, skilsmässor, bodelningar, arv och testamenten – med fokus på lösningar som värnar barnens och klientens trygghet.</li>
+                <li><i class="fas fa-plane-departure mr-2 text-blue-600"></i><strong>Migrationsrätt:</strong> Vi bistår i asylärenden, uppehållstillstånd, medborgarskap och överklaganden.</li>
+                <li><i class="fas fa-users-cog mr-2 text-blue-600"></i><strong>Socialrätt:</strong> Stöd i ärenden om LVU, LVM, LSS och liknande – med respekt för individens rätt till stöd och rättvisa processer.</li>
+                <li><i class="fas fa-balance-scale-right mr-2 text-blue-600"></i><strong>Tvistemål och civilrätt:</strong> Vi hanterar tvister om avtal, fordringar, skadestånd och andra civilrättsliga frågor – både i och utanför domstol.</li>
+                <li><i class="fas fa-chart-bar mr-2 text-blue-600"></i><strong>Affärsjuridik:</strong> Rådgivning för små och medelstora företag, exempelvis vid avtalsskrivning, bolagsrätt, arbetsrätt och tvistelösning.</li>
+            </ul>
+
+            <h3 class="text-2xl font-semibold text-blue-800 mb-3 mt-6">Våra värderingar:</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li><i class="fas fa-check-circle mr-2 text-blue-600"></i><strong>Tillgänglighet:</strong> Vi finns här när du behöver oss. Snabb återkoppling och tydlig kommunikation är en självklarhet.</li>
+                <li><i class="fas fa-check-circle mr-2 text-blue-600"></i><strong>Trygghet:</strong> Du ska känna dig sedd, förstådd och respekterad genom hela processen.</li>
+                <li><i class="fas fa-check-circle mr-2 text-blue-600"></i><strong>Engagemang:</strong> Vi ger varje ärende den tid och omsorg det förtjänar, oavsett omfattning.</li>
+                <li><i class="fas fa-check-circle mr-2 text-blue-600"></i><strong>Tydlighet:</strong> Vi förklarar juridiken så att du förstår den. Du får raka besked, realistiska bedömningar och en tydlig plan framåt.</li>
+            </ul>
+            <p class="text-gray-700 mt-4"><strong>Varför välja oss?</strong><br>Hos Din Advokat möter du erfarna jurister och advokater med både juridisk kompetens och genuint människointresse. Vi arbetar resultatinriktat, men alltid med hjärtat kvar i klientrelationen. Oavsett om du står inför en svår livssituation, en affärsutmaning eller ett komplext rättsärende – är vi din trygga juridiska partner.</p>
+            <p class="text-gray-700 mt-2 text-center font-bold">Din trygghet. Ditt rättsskydd. Din advokat.</p>
+        </div>
+    </div>
+
+    <!-- Emporia Köpcentrum Detaljmodal -->
+    <div id="emporia-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-emporia-details-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Emporia Köpcentrum - Mer Info</h2>
+            <p class="text-gray-700 mb-4">
+                Välkommen till Emporia, Älgholms största och mest moderna köpcentrum! Här hittar du allt du kan önska dig under ett och samma tak, från mode och inredning till elektronik och mat.
+            </p>
+            <h3 class="text-2xl font-semibold text-purple-700 mb-3 mt-6">Vad vi erbjuder:</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                <li><i class="fas fa-tshirt mr-2 text-purple-600"></i><strong>Mode och Kläder:</strong> De senaste trenderna från kända varumärken.</li>
+                <li><i class="fas fa-utensils mr-2 text-purple-600"></i><strong>Restauranger och Kaféer:</strong> Ett brett utbud av matupplevelser för alla smaker.</li>
+                <li><i class="fas fa-couch mr-2 text-purple-600"></i><strong>Hem och Inredning:</strong> Allt för att göra ditt hem personligt och mysigt.</li>
+                <li><i class="fas fa-mobile-alt mr-2 text-purple-600"></i><strong>Elektronik:</strong> Nyheter och klassiker inom teknik.</li>
+                <li><i class="fas fa-gift mr-2 text-purple-600"></i><strong>Presenter och Specialbutiker:</strong> Hitta den perfekta presenten för varje tillfälle.</li>
+            </ul>
+            <h3 class="text-2xl font-semibold text-purple-700 mb-3 mt-6">Öppettider:</h3>
+            <p class="text-gray-700"><i class="fas fa-clock mr-2 text-purple-600"></i>Mån-Fre: 10:00 - 20:00</p>
+            <p class="text-gray-700"><i class="fas fa-clock mr-2 text-purple-600"></i>Lör-Sön: 10:00 - 18:00</p>
+            <p class="text-gray-700 mt-4">Emporia är mer än bara ett köpcentrum – det är en mötesplats där du kan spendera en hel dag med shopping, god mat och underhållning. Välkommen!</p>
+        </div>
+    </div>
+
+    <!-- Modaler för "Sök Jobb" (statisk info borttagen, nu dynamisk) -->
+
+    <!-- Jobb Annonserings Modal -->
+    <div id="job-post-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-job-post-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Lägg ut en ny jobbannons</h2>
+            <form id="job-post-form" class="space-y-4">
+                <div>
+                    <label for="job-title" class="block text-gray-700 text-sm font-bold mb-2">Jobbtitel:</label>
+                    <input type="text" id="job-title" name="jobTitle" placeholder="T.ex. Sjuksköterska, Polis, Kock" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="job-image-upload" class="block text-gray-700 text-sm font-bold mb-2">Bild för annonsen (valfritt):</label>
+                    <input type="file" id="job-image-upload" accept="image/*" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <img id="job-image-preview" src="https://placehold.co/300x200/e0e7ff/6366f1?text=Jobbannonsbild" alt="Bildförhandsvisning" class="mt-4 w-full h-48 object-cover rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=Bild+saknas';">
+                </div>
+                <div>
+                    <label for="job-description" class="block text-gray-700 text-sm font-bold mb-2">Beskrivning:</label>
+                    <textarea id="job-description" name="jobDescription" rows="5" placeholder="Beskriv arbetsuppgifter, arbetsmiljö och vad ni söker..." class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                </div>
+                <div>
+                    <label for="job-requirements" class="block text-gray-700 text-sm font-bold mb-2">Krav/Kvalifikationer:</label>
+                    <textarea id="job-requirements" name="jobRequirements" rows="3" placeholder="T.ex. Erfarenhet av kundservice, körkort, god samarbetsförmåga..." class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">Lägg ut annons</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Jobb Detalj & Ansökningsmodal -->
+    <div id="job-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-job-detail-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center" id="job-detail-title"></h2>
+            <img id="job-detail-image" src="" alt="Jobbannonsbild" class="mt-4 w-full h-64 object-cover rounded-lg shadow-md mb-4" onerror="this.onerror=null;this.src='https://placehold.co/300x200/cccccc/333333?text=Bild+saknas';">
+            <p class="text-gray-700 mb-4" id="job-detail-description"></p>
+            <p class="text-gray-700 mb-4"><strong>Krav:</strong> <span id="job-detail-requirements"></span></p>
+            <p class="text-gray-600 text-sm mb-6">Annonserad av: <span id="job-detail-creator"></span> (<span id="job-detail-creator-pn"></span>) - <span id="job-detail-date"></span></p>
+
+            <h3 class="text-2xl font-semibold text-blue-700 mb-3 mt-6">Ansök till detta jobb:</h3>
+            <form id="job-apply-form" class="space-y-4">
+                <div>
+                    <label for="applicant-name" class="block text-gray-700 text-sm font-bold mb-2">Ditt fullständiga namn:</label>
+                    <input type="text" id="applicant-name" name="applicantName" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="applicant-personal-number" class="block text-gray-700 text-sm font-bold mb-2">Ditt personnummer:</label>
+                    <input type="text" id="applicant-personal-number" name="applicantPersonalNumber" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="applicant-motivation" class="block text-gray-700 text-sm font-bold mb-2">Din motivation/erfarenhet:</label>
+                    <textarea id="applicant-motivation" name="applicantMotivation" rows="4" placeholder="Berätta varför du är rätt person för jobbet..." class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                </div>
+                <button type="submit" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">Skicka ansökan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hus uthyres Modal (Nu för att lägga ut egen annons) -->
+    <div id="house-rental-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-house-rental-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Lägg ut ditt hus för uthyrning</h2>
+
+            <form id="house-rental-form" class="space-y-4">
+                <div>
+                    <label for="house-image-upload" class="block text-gray-700 text-sm font-bold mb-2">Bild på ditt hus:</label>
+                    <input type="file" id="house-image-upload" accept="Image of *>" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <Image of Husbild>
+                </div>
+                <div>
+                    <label for="house-title" class="block text-gray-700 text-sm font-bold mb-2">Titel på annonsen:</label>
+                    <input type="text" id="house-title" name="houseTitle" placeholder="T.ex. Mysigt radhus nära parken" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div>
+                    <label for="house-rent-amount" class="block text-gray-700 text-sm font-bold mb-2">Hyra per månad (kr):</label>
+                    <input type="number" id="house-rent-amount" name="rentAmount" placeholder="T.ex. 8500" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div>
+                    <label for="house-description" class="block text-gray-700 text-sm font-bold mb-2">Beskrivning av huset:</label>
+                    <textarea id="house-description" name="description" rows="3" placeholder="T.ex. Ett mysigt hus med 3 rum och kök, stor trädgård och nära till parken." class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required></textarea>
+                </div>
+                <button type="submit" class="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">Lägg ut annons</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hus Detalj Modal -->
+    <div id="housing-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-housing-detail-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center" id="housing-detail-title"></h2>
+            <Image of Husbild>
+            <p class="text-gray-700 mb-2"><strong>Hyra:</strong> <span id="housing-detail-rent"></span> kr/mån</p>
+            <p class="text-gray-700 mb-4" id="housing-detail-description"></p>
+            <p class="text-gray-600 text-sm mb-6">Annonserad av: <span id="housing-detail-creator"></span> (<span id="housing-detail-creator-pn"></span>) - <span id="housing-detail-date"></span></p>
+
+            <button id="contact-landlord-button" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">
+                Kontakta uthyraren
+            </button>
+        </div>
+    </div>
+
+    <!-- RP Session Skapa Modal -->
+    <div id="rp-session-create-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-rp-session-create-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Skapa ny RP-session</h2>
+            <form id="rp-session-create-form" class="space-y-4">
+                <div>
+                    <label for="rp-session-title" class="block text-gray-700 text-sm font-bold mb-2">Titel på sessionen:</label>
+                    <input type="text" id="rp-session-title" name="title" placeholder="T.ex. Polispatrull, Skoldag, Stadsfest" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div>
+                    <label for="rp-session-date" class="block text-gray-700 text-sm font-bold mb-2">Datum:</label>
+                    <input type="date" id="rp-session-date" name="date" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div>
+                    <label for="rp-session-time" class="block text-gray-700 text-sm font-bold mb-2">Tid:</label>
+                    <input type="time" id="rp-session-time" name="time" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div>
+                    <label for="rp-session-description" class="block text-gray-700 text-sm font-bold mb-2">Beskrivning:</label>
+                    <textarea id="rp-session-description" name="description" rows="4" placeholder="Beskriv vad sessionen handlar om och vad deltagarna kan förvänta sig..." class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required></textarea>
+                </div>
+                <div>
+                    <label for="rp-session-max-participants" class="block text-gray-700 text-sm font-bold mb-2">Max antal deltagare (valfritt):</label>
+                    <input type="number" id="rp-session-max-participants" name="maxParticipants" placeholder="T.ex. 10" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <button type="submit" class="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">Skapa session</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- RP Session Detalj Modal -->
+    <div id="rp-session-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-rp-session-detail-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center" id="rp-session-detail-title"></h2>
+            <p class="text-gray-700 mb-2"><strong>Datum:</strong> <span id="rp-session-detail-date"></span></p>
+            <p class="text-gray-700 mb-2"><strong>Tid:</strong> <span id="rp-session-detail-time"></span></p>
+            <p class="text-gray-700 mb-4" id="rp-session-detail-description"></p>
+            <p class="text-gray-700 mb-4"><strong>Max deltagare:</strong> <span id="rp-session-detail-max-participants"></span></p>
+            <p class="text-gray-600 text-sm mb-6">Skapad av: <span id="rp-session-detail-creator"></span> (<span id="rp-session-detail-creator-pn"></span>) - <span id="rp-session-detail-created-date"></span></p>
+
+            <button id="rp-session-signup-button" class="bg-yellow-600 hover:bg-yellow-700 text-blue-900 font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">
+                Anmäl dig till sessionen
+            </button>
+        </div>
+    </div>
+
+    <!-- Nyhet Skapa Modal -->
+    <div id="news-create-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-news-create-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Skapa ny nyhetsartikel</h2>
+            <form id="news-create-form" class="space-y-4">
+                <div>
+                    <label for="news-title" class="block text-gray-700 text-sm font-bold mb-2">Titel på nyheten:</label>
+                    <input type="text" id="news-title" name="title" placeholder="T.ex. Storbrand i centrala Älgholm!" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
+                </div>
+                <div>
+                    <label for="news-image-upload" class="block text-gray-700 text-sm font-bold mb-2">Bild för nyheten (valfritt):</label>
+                    <input type="file" id="news-image-upload" accept="Image of *>" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <Image of Nyhetsbild>
+                </div>
+                <div>
+                    <label for="news-content" class="block text-gray-700 text-sm font-bold mb-2">Nyhetsinnehåll:</label>
+                    <textarea id="news-content" name="content" rows="8" placeholder="Skriv hela nyhetsartikeln här..." class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-yellow-500" required></textarea>
+                </div>
+                <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-blue-900 font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">Publicera nyhet</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Nyhet Detalj Modal -->
+    <div id="news-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-news-detail-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center" id="news-detail-title"></h2>
+            <Image of Nyhetsbild>
+            <p class="text-gray-700 mb-4" id="news-detail-content"></p>
+            <p class="text-gray-600 text-sm mb-6">Publicerad av: <span id="news-detail-creator"></span> (<span id="news-detail-creator-pn"></span>) - <span id="news-detail-date"></span></p>
+        </div>
+    </div>
+
+
+    <!-- Skicka Meddelande Modal (oförändrad) -->
+    <div id="message-send-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-message-send-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Skicka Meddelande</h2>
+
+            <form id="message-send-form" class="space-y-4">
+                <div>
+                    <label for="recipient-personal-number" class="block text-gray-700 text-sm font-bold mb-2">Mottagarens personnummer:</label>
+                    <input type="text" id="recipient-personal-number" name="recipientPersonalNumber" placeholder="Personnummer" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div>
+                    <label for="message-content" class="block text-gray-700 text-sm font-bold mb-2">Ditt meddelande:</label>
+                    <textarea id="message-content" name="messageContent" rows="5" placeholder="Skriv ditt meddelande här..." class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-green-500" required></textarea>
+                </div>
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full w-full shadow-md transition-all duration-300 transform hover:scale-105">Skicka meddelande</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Meddelandelogg Modal -->
+    <div id="admin-message-log-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-admin-message-log-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Administratörsmeddelandelogg</h2>
+            <div id="admin-messages-list" class="space-y-3">
+                <!-- Globala meddelanden kommer att laddas här med JavaScript -->
+                <p class="text-gray-500" id="no-admin-messages-text">Inga meddelanden i loggen än.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Användarhantering Modal -->
+    <div id="admin-user-management-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-admin-user-management-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Hantera Användare och Roller</h2>
+            <div id="user-list-for-admin" class="space-y-3">
+                <!-- Användare laddas här -->
+                <p class="text-gray-500" id="no-users-text">Inga användare registrerade.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sjukvård Modal -->
+    <div id="sjukvard-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-sjukvard-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Sjukvård</h2>
+            <div class="flex flex-wrap justify-center gap-4 mb-6">
+                <button class="sjukvard-tab-button active bg-blue-700 text-white py-2 px-4 rounded-full font-semibold" data-tab="journal">Journal</button>
+                <button class="sjukvard-tab-button bg-gray-200 text-gray-700 py-2 px-4 rounded-full font-semibold" data-tab="important">Viktigt</button>
+                <button class="sjukvard-tab-button bg-gray-200 text-gray-700 py-2 px-4 rounded-full font-semibold" data-tab="clothes">Kläder</button>
+            </div>
+
+            <div id="sjukvard-journal-content" class="role-content-section active">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Patientjournaler</h3>
+                <div id="sjukvard-patient-list" class="space-y-2">
+                    <!-- Patienter laddas här -->
+                </div>
+            </div>
+
+            <div id="sjukvard-important-content" class="role-content-section">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Viktig Information</h3>
+                <div class="flex flex-wrap justify-center gap-4 mb-4">
+                    <button class="sjukvard-important-button bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-full font-semibold" data-subtab="rules">Regler</button>
+                    <button class="sjukvard-important-button bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-full font-semibold" data-subtab="gdpr">GDPR</button>
+                </div>
+                <div id="sjukvard-important-subcontent" class="mt-4 p-4 bg-white rounded-lg shadow-md text-gray-700">
+                    <p>Välj en kategori för att se viktig information.</p>
+                </div>
+            </div>
+
+            <div id="sjukvard-clothes-content" class="role-content-section">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Klädkoder</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-xl font-semibold text-gray-800">Läkare</h4>
+                        <p class="text-gray-700"><strong>Obligatoriskt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>Topp: 1013931715</li>
+                            <li>Byxor: 5692765832</li>
+                            <li>Skjorta: 90454899720551</li>
+                        </ul>
+                        <p class="text-gray-700 mt-2"><strong>Frivilligt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>84011270127791</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold text-gray-800">Ambulans</h4>
+                        <p class="text-gray-700"><strong>Obligatoriskt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>Topp: 14578252403</li>
+                            <li>Byxor: 104855335601918</li>
+                            <li>Skjorta: 102651472673898</li>
+                            <li>Hjälm: 101731189694994</li>
+                        </ul>
+                        <p class="text-gray-700 mt-2"><strong>Frivilligt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>74086731856155</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Polis Modal -->
+    <div id="polis-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-polis-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Polisen</h2>
+            <div class="flex flex-wrap justify-center gap-4 mb-6">
+                <button class="polis-tab-button active bg-blue-700 text-white py-2 px-4 rounded-full font-semibold" data-tab="rules">Regler</button>
+                <button class="polis-tab-button bg-gray-200 text-gray-700 py-2 px-4 rounded-full font-semibold" data-tab="gdpr">GDPR</button>
+                <button class="polis-tab-button bg-gray-200 text-gray-700 py-2 px-4 rounded-full font-semibold" data-tab="clothes">Kläder</button>
+            </div>
+
+            <div id="polis-rules-content" class="role-content-section active">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Regler för Polisen</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li><i class="fas fa-gavel mr-2 text-blue-500"></i>Följ alltid lagar och förordningar i Älgholm.</li>
+                    <li><i class="fas fa-user-shield mr-2 text-blue-500"></i>Upprätthåll ordning och säkerhet för alla invånare.</li>
+                    <li><i class="fas fa-handcuffs mr-2 text-blue-500"></i>Använd proportionerligt våld och gripanden.</li>
+                    <li><i class="fas fa-car-alt mr-2 text-blue-500"></i>Kör fordon ansvarsfullt under utryckning.</li>
+                    <li><i class="fas fa-microphone mr-2 text-blue-500"></i>Kommunicera tydligt och professionellt.</li>
+                    <li><i class="fas fa-book mr-2 text-blue-500"></i>Dokumentera alla händelser och rapporter noggrant.</li>
+                </ul>
+            </div>
+
+            <div id="polis-gdpr-content" class="role-content-section">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">GDPR för Polisen</h3>
+                <p class="text-gray-700">
+                    Som polis hanterar du känsliga personuppgifter om medborgare, misstänkta och brottsoffer. Det är avgörande att du följer GDPR och andra relevanta lagar för dataskydd.
+                    <br><br>
+                    <strong>Viktiga punkter:</strong>
+                </p>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li>Samla endast in uppgifter som är nödvändiga för ditt uppdrag.</li>
+                    <li>Skydda all information mot obehörig åtkomst.</li>
+                    <li>Dela inte information med obehöriga parter.</li>
+                    <li>Förstå patienters/medborgares rättigheter gällande deras data.</li>
+                    <li>Rapportera alla dataintrång eller säkerhetsincidenter omedelbart.</li>
+                </ul>
+                <p class="text-gray-700 mt-4">
+                    Utbildning i dataskydd är obligatorisk och regelbunden uppföljning sker för att säkerställa efterlevnad.
+                </p>
+            </div>
+
+            <div id="polis-clothes-content" class="role-content-section">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Klädkoder för Polisen</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-xl font-semibold text-gray-800">Polisuniform</h4>
+                        <p class="text-gray-700"><strong>Obligatoriskt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>Topp: [ID för Polis Topp]</li>
+                            <li>Byxor: [ID för Polis Byxor]</li>
+                            <li>Hatt: [ID för Polis Hatt]</li>
+                        </ul>
+                        <p class="text-gray-700 mt-2"><strong>Frivilligt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>[ID för Polis Solglasögon]</li>
+                            <li>[ID för Polis Väst]</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Borgmästare Modal -->
+    <div id="borgmastare-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-borgmastare-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Borgmästarkontoret</h2>
+            <div class="flex flex-wrap justify-center gap-4 mb-6">
+                <button class="borgmastare-tab-button active bg-blue-700 text-white py-2 px-4 rounded-full font-semibold" data-tab="responsibilities">Ansvar</button>
+                <button class="borgmastare-tab-button bg-gray-200 text-gray-700 py-2 px-4 rounded-full font-semibold" data-tab="policies">Policyer</button>
+                <button class="borgmastare-tab-button bg-gray-200 text-gray-700 py-2 px-4 rounded-full font-semibold" data-tab="clothes">Kläder</button>
+            </div>
+
+            <div id="borgmastare-responsibilities-content" class="role-content-section active">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Borgmästarens Ansvar</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li><i class="fas fa-city mr-2 text-blue-500"></i>Leda och utveckla Älgholm kommun.</li>
+                    <li><i class="fas fa-handshake mr-2 text-blue-500"></i>Representera kommunen i externa kontakter.</li>
+                    <li><i class="fas fa-chart-line mr-2 text-blue-500"></i>Ansvara för kommunens budget och ekonomi.</li>
+                    <li><i class="fas fa-users mr-2 text-blue-500"></i>Främja medborgarnas välfärd och inflytande.</li>
+                    <li><i class="fas fa-bullhorn mr-2 text-blue-500"></i>Informera om viktiga beslut och händelser.</li>
+                </ul>
+            </div>
+
+            <div id="borgmastare-policies-content" class="role-content-section">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Viktiga Policyer</h3>
+                <p class="text-gray-700">
+                    Som borgmästare är det viktigt att du agerar enligt kommunens fastställda policyer och etiska riktlinjer.
+                    <br><br>
+                    <strong>Exempel på policyer:</strong>
+                </p>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li>Transparens i beslutsfattande.</li>
+                    <li>Jämlikhet och icke-diskriminering.</li>
+                    <li>Hållbar stadsutveckling.</li>
+                    <li>Medborgardialog och delaktighet.</li>
+                </ul>
+                <p class="text-gray-700 mt-4">
+                    Alla policyer finns tillgängliga för granskning i stadshuset.
+                </p>
+            </div>
+
+            <div id="borgmastare-clothes-content" class="role-content-section">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Klädkoder för Borgmästaren</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-xl font-semibold text-gray-800">Formell Klädsel</h4>
+                        <p class="text-gray-700"><strong>Obligatoriskt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>Topp: [ID för Kostymtopp]</li>
+                            <li>Byxor: [ID för Kostymbyxor]</li>
+                            <li>Skjorta: [ID för Formell Skjorta]</li>
+                        </ul>
+                        <p class="text-gray-700 mt-2"><strong>Frivilligt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>[ID för Slips]</li>
+                            <li>[ID för Kavaj]</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Körskola Modal -->
+    <div id="korskola-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-korskola-modal-button">&times;</span>
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 text-center">Körskolan</h2>
+            <div class="flex flex-wrap justify-center gap-4 mb-6">
+                <button class="korskola-tab-button active bg-blue-700 text-white py-2 px-4 rounded-full font-semibold" data-tab="courses">Kurser</button>
+                <button class="korskola-tab-button bg-gray-200 text-gray-700 py-2 px-4 rounded-full font-semibold" data-tab="tips">Köra Tips</button>
+                <button class="korskola-tab-button bg-gray-200 text-gray-700 py-2 px-4 rounded-full font-semibold" data-tab="clothes">Kläder</button>
+            </div>
+
+            <div id="korskola-courses-content" class="role-content-section active">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Våra Kurser</h3>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li><i class="fas fa-car mr-2 text-blue-500"></i>Grundläggande Körkort (B-körkort)</li>
+                    <li><i class="fas fa-motorcycle mr-2 text-blue-500"></i>Motorcykelkörkort (A-körkort)</li>
+                    <li><i class="fas fa-truck mr-2 text-blue-500"></i>Tungt Körkort (C/CE-körkort)</li>
+                    <li><i class="fas fa-road mr-2 text-blue-500"></i>Riskutbildning 1 & 2</li>
+                    <li><i class="fas fa-book-open mr-2 text-blue-500"></i>Teorilektioner och provträning</li>
+                </ul>
+            </div>
+
+            <div id="korskola-tips-content" class="role-content-section">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Tips för Säker Körning</h3>
+                <p class="text-gray-700">
+                    För att bli en säker och ansvarsfull förare i Älgholm, tänk på följande:
+                    <br><br>
+                    <strong>Viktiga tips:</strong>
+                </p>
+                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+                    <li>Håll alltid hastighetsbegränsningarna.</li>
+                    <li>Var uppmärksam på fotgängare och cyklister.</li>
+                    <li>Använd blinkers i god tid.</li>
+                    <li>Håll avstånd till framförvarande fordon.</li>
+                    <li>Kör aldrig under påverkan.</li>
+                </ul>
+                <p class="text-gray-700 mt-4">
+                    Öva regelbundet och var alltid fokuserad på trafiken.
+                </p>
+            </div>
+
+            <div id="korskola-clothes-content" class="role-content-section">
+                <h3 class="text-2xl font-semibold text-blue-700 mb-4">Klädkoder för Körskolan</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-xl font-semibold text-gray-800">Körlärare Uniform</h4>
+                        <p class="text-gray-700"><strong>Obligatoriskt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>Topp: [ID för Körlärare Topp]</li>
+                            <li>Byxor: [ID för Körlärare Byxor]</li>
+                        </ul>
+                        <p class="text-gray-700 mt-2"><strong>Frivilligt:</strong></p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4">
+                            <li>[ID för Reflexväst]</li>
+                            <li>[ID för Keps]</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nytt Meddelande Notis Modal (pop-up) (oförändrad) -->
+    <div id="notification-modal" class="hidden">
+        <strong id="notification-sender"></strong>
+        <p id="notification-message"></p>
+    </div>
+
+    <!-- Bekräftelse Modal -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-confirmation-modal-button">&times;</span>
+            <h2 class="text-2xl font-bold text-blue-800 mb-4 text-center">Bekräfta borttagning</h2>
+            <p id="confirmation-message" class="text-gray-700 mb-6 text-center">Är du säker på att du vill ta bort detta objekt?</p>
+            <div class="flex justify-center gap-4">
+                <button id="confirm-delete-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">Ja, ta bort</button>
+                <button id="cancel-delete-button" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Globala variabler för att hålla reda på inloggningsstatus och användardata
+        let loggedInUser = null;
+        let characters = JSON.parse(localStorage.getItem('algholmCharacters')) || [];
+        let jobListings = JSON.parse(localStorage.getItem('algholmJobListings')) || [];
+        let housingListings = JSON.parse(localStorage.getItem('algholmHousingListings')) || [];
+        let rpSessions = JSON.parse(localStorage.getItem('algholmRPSessions')) || [];
+        let newsArticles = JSON.parse(localStorage.getItem('algholmNewsArticles')) || [];
+        let globalMessages = JSON.parse(localStorage.getItem('algholmGlobalMessages')) || []; // Ny global meddelandelogg
+
+        // Hämta DOM-element
+        const navToggle = document.getElementById('nav-toggle');
+        const navContent = document.getElementById('nav-content');
+        const navLinks = document.querySelectorAll('#nav-content a');
+        const loginButton = document.getElementById('login-button');
+        const homeLoginButton = document.getElementById('home-login-button');
+        const loginModal = document.getElementById('login-modal');
+        const closeModalButton = document.getElementById('close-modal-button');
+        const loginTabButton = document.getElementById('login-tab-button');
+        const registerTabButton = document.getElementById('register-tab-button');
+        const loginFormContainer = document.getElementById('login-form-container');
+        const registerFormContainer = document.getElementById('register-form-container');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const myAlgholmNavItem = document.getElementById('my-algholm-nav-item');
+        const logoutButton = document.getElementById('logout-button');
+        const homeLink = document.getElementById('home-link');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+
+        const profilePictureInput = document.getElementById('profile-picture-input');
+        const uploadProfilePicButton = document.getElementById('upload-profile-pic-button');
+        const profilePictureDisplay = document.getElementById('profile-picture-display');
+
+        // Hotellmodalen
+        const openHotelDetailsButton = document.getElementById('open-hotel-details-button');
+        const hotelDetailsModal = document.getElementById('hotel-details-modal');
+        const closeHotelDetailsModalButton = document.getElementById('close-hotel-details-modal-button');
+
+        // Företagsmodaler (oförändrade)
+        const openKarlssonsEkonomiButton = document.getElementById('open-karlssons-ekonomi-button');
+        const karlssonsEkonomiModal = document.getElementById('karlssons-ekonomi-modal');
+        const closeKarlssonsEkonomiModalButton = document.getElementById('close-karlssons-ekonomi-modal-button');
+
+        const openKarlssonsKorskolaButton = document.getElementById('open-karlssons-korskola-button');
+        const karlssonsKorskolaModal = document.getElementById('karlssons-korskola-modal');
+        const closeKarlssonsKorskolaModalButton = document.getElementById('close-karlssons-korskola-modal-button');
+
+        const openKarlssonsJuridikButton = document.getElementById('open-karlssons-juridik-button');
+        const karlssonsJuridikModal = document.getElementById('karlssons-juridik-modal');
+        const closeKarlssonsJuridikModalButton = document.getElementById('close-karlssons-juridik-modal-button');
+
+        const openDinAdvokatButton = document.getElementById('open-din-advokat-button');
+        const dinAdvokatModal = document.getElementById('din-advokat-modal');
+        const closeDinAdvokatModalButton = document.getElementById('close-din-advokat-modal-button');
+
+        // Ny knapp för att öppna skolan från kommunen
+        const openSchoolFromMunicipalityButton = document.getElementById('open-school-from-municipality-button');
+        // Nya element för Emporia
+        const openEmporiaButton = document.getElementById('open-emporia-button');
+        const emporiaDetailsModal = document.getElementById('emporia-details-modal');
+        const closeEmporiaDetailsModalButton = document.getElementById('close-emporia-details-modal-button');
+
+
+        // Meddelandefunktion (oförändrad)
+        const sendMessageButton = document.getElementById('send-message-button');
+        const messageSendModal = document.getElementById('message-send-modal');
+        const closeMessageSendModalButton = document.getElementById('close-message-send-modal-button');
+        const messageSendForm = document.getElementById('message-send-form');
+        const messagesList = document.getElementById('messages-list');
+        const noMessagesText = document.getElementById('no-messages-text');
+        const unreadMessagesCount = document.getElementById('unread-messages-count');
+        const markAllReadButton = document.getElementById('mark-all-read-button');
+        const viewAdminMessagesButton = document.getElementById('view-admin-messages-button'); // Ny admin-knapp
+        const adminMessageLogModal = document.getElementById('admin-message-log-modal'); // Ny admin-modal
+        const closeAdminMessageLogModalButton = document.getElementById('close-admin-message-log-modal-button'); // Ny admin-modal stängknapp
+        const adminMessagesList = document.getElementById('admin-messages-list'); // Ny admin-meddelandelista
+        const noAdminMessagesText = document.getElementById('no-admin-messages-text'); // Ny admin-meddelandetext
+
+        const notificationModal = document.getElementById('notification-modal');
+        const notificationSender = document.getElementById('notification-sender');
+        const notificationMessage = document.getElementById('notification-message');
+
+        // Nya element för dynamiska jobbannonser
+        const jobListingsContainer = document.getElementById('job-listings-container');
+        const openJobPostButton = document.getElementById('open-job-post-button');
+        const jobPostModal = document.getElementById('job-post-modal');
+        const closeJobPostModalButton = document.getElementById('close-job-post-modal-button');
+        const jobPostForm = document.getElementById('job-post-form');
+        const jobImageUpload = document.getElementById('job-image-upload');
+        const jobImagePreview = document.getElementById('job-image-preview');
+
+        const jobDetailModal = document.getElementById('job-detail-modal');
+        const closeJobDetailModalButton = document.getElementById('close-job-detail-modal-button');
+        const jobDetailTitle = document.getElementById('job-detail-title');
+        const jobDetailImage = document.getElementById('job-detail-image');
+        const jobDetailDescription = document.getElementById('job-detail-description');
+        const jobDetailRequirements = document.getElementById('job-detail-requirements');
+        const jobDetailCreator = document.getElementById('job-detail-creator');
+        const jobDetailCreatorPn = document.getElementById('job-detail-creator-pn');
+        const jobDetailDate = document.getElementById('job-detail-date');
+        const jobApplyForm = document.getElementById('job-apply-form');
+
+        // Nya element för dynamiska husannonser
+        const dynamicHousingListingsContainer = document.getElementById('dynamic-housing-listings-container');
+        const openHouseRentalButton = document.getElementById('open-house-rental-button');
+        const houseRentalModal = document.getElementById('house-rental-modal');
+        const closeHouseRentalModalButton = document.getElementById('close-house-rental-modal-button');
+        const houseRentalForm = document.getElementById('house-rental-form');
+        const houseImageUpload = document.getElementById('house-image-upload');
+        const houseImageDisplay = document.getElementById('house-image-display');
+        const houseTitleInput = document.getElementById('house-title');
+        const openCentralApartmentButton = document.getElementById('open-central-apartment-button');
+
+        const housingDetailModal = document.getElementById('housing-detail-modal');
+        const closeHousingDetailModalButton = document.getElementById('close-housing-detail-modal-button');
+        const housingDetailTitle = document.getElementById('housing-detail-title');
+        const housingDetailImage = document.getElementById('housing-detail-image');
+        const housingDetailRent = document.getElementById('housing-detail-rent');
+        const housingDetailDescription = document.getElementById('housing-detail-description');
+        const housingDetailCreator = document.getElementById('housing-detail-creator');
+        const housingDetailCreatorPn = document.getElementById('housing-detail-creator-pn');
+        const housingDetailDate = document = document.getElementById('housing-detail-date');
+        const contactLandlordButton = document.getElementById('contact-landlord-button');
+
+        // Nya element för RP-sessioner
+        const rpSessionsListingsContainer = document.getElementById('rp-sessions-listings-container');
+        const openRpSessionCreateButton = document.getElementById('open-rp-session-create-button');
+        const rpSessionCreateModal = document.getElementById('rp-session-create-modal');
+        const closeRpSessionCreateModalButton = document.getElementById('close-rp-session-create-modal-button');
+        const rpSessionCreateForm = document.getElementById('rp-session-create-form');
+
+        const rpSessionDetailModal = document.getElementById('rp-session-detail-modal');
+        const closeRpSessionDetailModalButton = document.getElementById('close-rp-session-detail-modal-button');
+        const rpSessionDetailTitle = document.getElementById('rp-session-detail-title');
+        const rpSessionDetailDate = document.getElementById('rp-session-detail-date');
+        const rpSessionDetailTime = document.getElementById('rp-session-detail-time');
+        const rpSessionDetailDescription = document.getElementById('rp-session-detail-description');
+        const rpSessionDetailMaxParticipants = document.getElementById('rp-session-max-participants');
+        const rpSessionDetailCreator = document.getElementById('rp-session-detail-creator');
+        const rpSessionDetailCreatorPn = document.getElementById('rp-session-detail-creator-pn');
+        const rpSessionDetailCreatedDate = document.getElementById('rp-session-detail-created-date');
+        const rpSessionSignupButton = document.getElementById('rp-session-signup-button');
+
+
+        // Nya element för Nyhetskanal
+        const newsArticlesContainer = document.getElementById('news-articles-container');
+        const openNewsCreateButton = document.getElementById('open-news-create-button');
+        const newsCreateModal = document.getElementById('news-create-modal');
+        const closeNewsCreateModalButton = document.getElementById('close-news-create-modal-button');
+        const newsCreateForm = document.getElementById('news-create-form');
+        const newsImageUpload = document.getElementById('news-image-upload');
+        const newsImagePreview = document.getElementById('news-image-preview');
+
+        const newsDetailModal = document.getElementById('news-detail-modal');
+        const closeNewsDetailModalButton = document.getElementById('close-news-detail-modal-button');
+        const newsDetailTitle = document.getElementById('news-detail-title');
+        const newsDetailImage = document.getElementById('news-detail-image');
+        const newsDetailContent = document.getElementById('news-detail-content');
+        const newsDetailCreator = document.getElementById('news-detail-creator');
+        const newsDetailCreatorPn = document.getElementById('news-detail-creator-pn');
+        const newsDetailDate = document.getElementById('news-detail-date');
+
+        // Nya element för admin användarhantering
+        const adminUserManagementModal = document.getElementById('admin-user-management-modal');
+        const closeAdminUserManagementModalButton = document.getElementById('close-admin-user-management-modal-button');
+        const userListForAdmin = document.getElementById('user-list-for-admin');
+        const noUsersText = document.getElementById('no-users-text');
+
+        // Nya element för roll-specifika sidor
+        const roleSpecificButtonsContainer = document.getElementById('role-specific-buttons-container');
+
+        const sjukvardModal = document.getElementById('sjukvard-modal');
+        const closeSjukvardModalButton = document.getElementById('close-sjukvard-modal-button');
+        const sjukvardTabButtons = document.querySelectorAll('.sjukvard-tab-button');
+        const sjukvardContentSections = document.querySelectorAll('#sjukvard-modal .role-content-section');
+        const sjukvardPatientList = document.getElementById('sjukvard-patient-list');
+        const sjukvardImportantSubcontent = document.getElementById('sjukvard-important-subcontent');
+        const sjukvardImportantButtons = document.querySelectorAll('.sjukvard-important-button');
+
+        const polisModal = document.getElementById('polis-modal');
+        const closePolisModalButton = document.getElementById('close-polis-modal-button');
+        const polisTabButtons = document.querySelectorAll('.polis-tab-button');
+        const polisContentSections = document.querySelectorAll('#polis-modal .role-content-section');
+
+        const borgmastareModal = document.getElementById('borgmastare-modal');
+        const closeBorgmastareModalButton = document.getElementById('close-borgmastare-modal-button');
+        const borgmastareTabButtons = document.querySelectorAll('.borgmastare-tab-button');
+        const borgmastareContentSections = document.querySelectorAll('#borgmastare-modal .role-content-section');
+
+        const korskolaModal = document.getElementById('korskola-modal');
+        const closeKorskolaModalButton = document.getElementById('close-korskola-modal-button');
+        const korskolaTabButtons = document.querySelectorAll('.korskola-tab-button');
+        const korskolaContentSections = document.querySelectorAll('#korskola-modal .role-content-section');
+
+        // Bekräftelsemodal
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        const confirmDeleteButton = document.getElementById('confirm-delete-button');
+        const cancelDeleteButton = document.getElementById('cancel-delete-button');
+        const closeConfirmationModalButton = document.getElementById('close-confirmation-modal-button');
+
+        let currentDeleteItem = null; // För att hålla reda på vilket objekt som ska tas bort
+
+
+        // Hjälpfunktioner
+        function showMessage(message, type = 'success') {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden', 'bg-green-100', 'border-green-400', 'text-green-700', 'bg-red-100', 'border-red-400', 'text-red-700');
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+            } else if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            }
+            messageBox.classList.remove('hidden');
+        }
+
+        function hideMessage() {
+            messageBox.classList.add('hidden');
+        }
+
+        function showNotification(sender, message, type = 'success') {
+            notificationSender.textContent = sender;
+            notificationMessage.textContent = message;
+            notificationModal.classList.remove('hidden', 'success', 'error');
+            notificationModal.classList.add(type);
+            notificationModal.style.animation = 'none';
+            void notificationModal.offsetWidth;
+            notificationModal.style.animation = null;
+            setTimeout(() => {
+                notificationModal.classList.add('hidden');
+            }, 8000);
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${sectionId}-section`).classList.add('active');
+            if (navContent.classList.contains('block')) {
+                navContent.classList.remove('block');
+                navContent.classList.add('hidden');
+            }
+            // Uppdatera dynamiska listor när deras sektioner visas
+            if (sectionId === 'my-algholm' && loggedInUser) {
+                displayReceivedMessages();
+                updateAdminUI(); // Uppdatera admin-knappar
+                updateRoleSpecificButtons(); // Uppdatera roll-specifika knappar
+            } else if (sectionId === 'jobs') {
+                renderJobListings();
+            } else if (sectionId === 'housing') {
+                renderHousingListings(); // Se till att denna anropas för att ladda dynamiska
+            } else if (sectionId === 'rp-sessions') {
+                renderRPSessions();
+            } else if (sectionId === 'news-channel') {
+                renderNewsArticles();
+            }
+        }
+
+        function updateNavigation() {
+            if (loggedInUser) {
+                loginButton.classList.add('hidden');
+                myAlgholmNavItem.classList.remove('hidden');
+            } else {
+                loginButton.classList.remove('hidden');
+                myAlgholmNavItem.classList.add('hidden');
+            }
+        }
+
+        function initializeAdminAccount() {
+            const adminPN = '132465';
+            const adminExists = characters.some(char => char.personalNumber === adminPN);
+            if (!adminExists) {
+                const adminAccount = {
+                    characterName: 'Älgholm Admin',
+                    discordName: 'Admin#0000',
+                    characterType: 'Administratör för Älgholm RP',
+                    dreamJob: 'Stadsutvecklare',
+                    personalNumber: adminPN,
+                    profilePicture: null,
+                    receivedMessages: [],
+                    role: 'admin' // Lägg till roll
+                };
+                characters.push(adminAccount);
+                localStorage.setItem('algholmCharacters', JSON.stringify(characters));
+            }
+        }
+
+        function loadUserData() {
+            initializeAdminAccount(); // Se till att admin-kontot finns
+            const storedUser = localStorage.getItem('loggedInUser');
+            if (storedUser) {
+                loggedInUser = JSON.parse(storedUser);
+                updateNavigation();
+                updateMyAlgholmSection();
+                showSection('my-algholm');
+            } else {
+                showSection('home');
+            }
+            // Ladda dynamiska listor vid start
+            renderJobListings();
+            renderHousingListings();
+            renderRPSessions();
+            renderNewsArticles();
+            if (loggedInUser) {
+                displayReceivedMessages();
+                updateAdminUI(); // Uppdatera admin-knappar vid inloggning
+                updateRoleSpecificButtons(); // Uppdatera roll-specifika knappar vid inloggning
+            }
+        }
+
+        function updateMyAlgholmSection() {
+            if (loggedInUser) {
+                document.getElementById('character-name-display').textContent = loggedInUser.characterName;
+                document.getElementById('personal-number-display').textContent = loggedInUser.personalNumber;
+                document.getElementById('discord-name-display').textContent = loggedInUser.discordName || 'Ej angivet';
+                document.getElementById('character-type-display').textContent = loggedInUser.characterType;
+                document.getElementById('dream-job-display').textContent = loggedInUser.dreamJob;
+                document.getElementById('user-role-display').textContent = loggedInUser.role ? loggedInUser.role.charAt(0).toUpperCase() + loggedInUser.role.slice(1) : 'Användare';
+                profilePictureDisplay.src = loggedInUser.profilePicture || 'https://placehold.co/192x192/cccccc/333333?text=Profilbild';
+                displayReceivedMessages();
+                updateAdminUI(); // Uppdatera admin-knappar
+                updateRoleSpecificButtons(); // Uppdatera roll-specifika knappar
+            }
+        }
+
+        function updateAdminUI() {
+            // Alla kan lägga ut jobb och bostäder
+            openJobPostButton.classList.remove('hidden');
+            openHouseRentalButton.classList.remove('hidden');
+
+            // Endast admin kan skapa RP-sessioner och nyheter
+            if (loggedInUser && loggedInUser.role === 'admin') {
+                openRpSessionCreateButton.classList.remove('hidden');
+                openNewsCreateButton.classList.remove('hidden');
+                viewAdminMessagesButton.classList.remove('hidden'); // Visa admin meddelandelogg
+                document.getElementById('open-admin-user-management-button').classList.remove('hidden'); // Visa admin användarhantering
+            } else {
+                openRpSessionCreateButton.classList.add('hidden');
+                openNewsCreateButton.classList.add('hidden');
+                viewAdminMessagesButton.classList.add('hidden'); // Dölj admin meddelandelogg
+                document.getElementById('open-admin-user-management-button').classList.add('hidden'); // Dölj admin användarhantering
+            }
+        }
+
+        function updateRoleSpecificButtons() {
+            roleSpecificButtonsContainer.innerHTML = '<h3 class="text-2xl font-semibold text-blue-700 mb-4">Mina Roll-specifika Verktyg</h3>'; // Rensa och lägg till rubrik
+            if (loggedInUser && loggedInUser.role && loggedInUser.role !== 'user' && loggedInUser.role !== 'admin') {
+                let buttonHtml = '';
+                let buttonClass = '';
+                let buttonText = '';
+                let modalId = '';
+                let iconClass = '';
+
+                switch (loggedInUser.role) {
+                    case 'sjukvard':
+                        buttonClass = 'bg-red-600 hover:bg-red-700';
+                        buttonText = 'Sjukvård Verktyg';
+                        modalId = 'sjukvard-modal';
+                        iconClass = 'fas fa-heartbeat';
+                        break;
+                    case 'polis':
+                        buttonClass = 'bg-blue-600 hover:bg-blue-700';
+                        buttonText = 'Polis Verktyg';
+                        modalId = 'polis-modal';
+                        iconClass = 'fas fa-shield-alt';
+                        break;
+                    case 'borgmastare':
+                        buttonClass = 'bg-purple-600 hover:bg-purple-700';
+                        buttonText = 'Borgmästar Verktyg';
+                        modalId = 'borgmastare-modal';
+                        iconClass = 'fas fa-city';
+                        break;
+                    case 'korskola':
+                        buttonClass = 'bg-green-600 hover:bg-green-700';
+                        buttonText = 'Körskola Verktyg';
+                        modalId = 'korskola-modal';
+                        iconClass = 'fas fa-car';
+                        break;
+                    default:
+                        // Ingen specifik roll, visa inga knappar
+                        return;
+                }
+
+                buttonHtml = `
+                    <button id="open-role-tool-button" class="${buttonClass} text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 mt-4">
+                        <i class="${iconClass} mr-2"></i>${buttonText}
+                    </button>
+                `;
+                roleSpecificButtonsContainer.insertAdjacentHTML('beforeend', buttonHtml);
+
+                document.getElementById('open-role-tool-button').addEventListener('click', () => {
+                    document.getElementById(modalId).style.display = 'flex';
+                });
+            }
+        }
+
+
+        function displayReceivedMessages() {
+            messagesList.innerHTML = '';
+            if (!loggedInUser || !loggedInUser.receivedMessages || loggedInUser.receivedMessages.length === 0) {
+                noMessagesText.classList.remove('hidden');
+                markAllReadButton.classList.add('hidden');
+                unreadMessagesCount.textContent = '0';
+                return;
+            }
+
+            noMessagesText.classList.add('hidden');
+            let unreadCount = 0;
+
+            const sortedMessages = [...loggedInUser.receivedMessages].sort((a, b) => {
+                if (a.read === b.read) {
+                    return new Date(b.timestamp) - new Date(a.timestamp);
+                }
+                return a.read ? 1 : -1;
+            });
+
+            sortedMessages.forEach((msg, index) => {
+                const messageItem = document.createElement('div');
+                messageItem.classList.add('message-item');
+                if (!msg.read) {
+                    messageItem.classList.add('unread');
+                    unreadCount++;
+                }
+
+                const senderName = characters.find(char => char.personalNumber === msg.senderPersonalNumber)?.characterName || 'Okänd Avsändare';
+                const timestamp = new Date(msg.timestamp).toLocaleString();
+
+                messageItem.innerHTML = `
+                    <div>
+                        <p class="text-sm text-gray-800"><strong>Från:</strong> ${senderName} (${msg.senderPersonalNumber})</p>
+                        <p class="text-gray-900 mt-1">${msg.message}</p>
+                        <p class="text-xs text-gray-500 mt-1">Mottaget: ${timestamp}</p>
+                    </div>
+                    ${!msg.read ? `<button data-index="${index}" class="mark-read-button bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold py-1 px-2 rounded-full ml-4">Markera som läst</button>` : ''}
+                `;
+                messagesList.appendChild(messageItem);
+            });
+
+            unreadMessagesCount.textContent = unreadCount;
+            if (unreadCount > 0) {
+                markAllReadButton.classList.remove('hidden');
+            } else {
+                markAllReadButton.classList.add('hidden');
+            }
+
+            document.querySelectorAll('.mark-read-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    if (loggedInUser && loggedInUser.receivedMessages && loggedInUser.receivedMessages[index]) {
+                        loggedInUser.receivedMessages[index].read = true;
+                        const charIndex = characters.findIndex(char => char.personalNumber === loggedInUser.personalNumber);
+                        if (charIndex !== -1) {
+                            characters[charIndex] = { ...loggedInUser };
+                            localStorage.setItem('algholmCharacters', JSON.stringify(characters));
+                            localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+                        }
+                        displayReceivedMessages();
+                        showMessage('Meddelande markerat som läst.', 'success');
+                    }
+                });
+            });
+        }
+
+        function displayGlobalMessagesForAdmin() {
+            adminMessagesList.innerHTML = '';
+            if (globalMessages.length === 0) {
+                noAdminMessagesText.classList.remove('hidden');
+                return;
+            }
+            noAdminMessagesText.classList.add('hidden');
+
+            const sortedGlobalMessages = [...globalMessages].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            sortedGlobalMessages.forEach(msg => {
+                const messageItem = document.createElement('div');
+                messageItem.classList.add('message-item');
+
+                const senderName = characters.find(char => char.personalNumber === msg.senderPersonalNumber)?.characterName || 'Okänd Avsändare';
+                const recipientName = characters.find(char => char.personalNumber === msg.recipientPersonalNumber)?.characterName || 'Okänd Mottagare';
+                const timestamp = new Date(msg.timestamp).toLocaleString();
+
+                messageItem.innerHTML = `
+                    <div>
+                        <p class="text-sm text-gray-800"><strong>Från:</strong> ${senderName} (${msg.senderPersonalNumber})</p>
+                        <p class="text-sm text-gray-800"><strong>Till:</strong> ${recipientName} (${msg.recipientPersonalNumber})</p>
+                        <p class="text-gray-900 mt-1">${msg.message}</p>
+                        <p class="text-xs text-gray-500 mt-1">Skickat: ${timestamp}</p>
+                    </div>
+                `;
+                adminMessagesList.appendChild(messageItem);
+            });
+        }
+
+
+        // --- Dynamiska Jobbannonser ---
+        function renderJobListings() {
+            jobListingsContainer.innerHTML = ''; // Rensa befintliga jobb
+            if (jobListings.length === 0) {
+                jobListingsContainer.innerHTML = '<p class="text-gray-500 col-span-full text-center">Inga jobb annonserade än.</p>';
+                return;
+            }
+
+            jobListings.forEach((job, index) => {
+                const creatorName = characters.find(char => char.personalNumber === job.creatorPersonalNumber)?.characterName || 'Okänd';
+                const jobCard = document.createElement('div');
+                jobCard.classList.add('dynamic-card', 'bg-blue-50');
+                jobCard.innerHTML = `
+                    <img src="${job.imageUrl || 'https://placehold.co/400x250/a78bfa/ffffff?text=Jobbannonsbild'}" alt="${job.title}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Bild+saknas';">
+                    <div class="p-6">
+                        <h3 class="dynamic-card-title">${job.title}</h3>
+                        <p class="dynamic-card-description">${job.description.substring(0, 100)}...</p>
+                        <p class="text-gray-600 text-sm mb-4">Annonserad av: ${creatorName}</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <button data-id="${job.id}" data-type="job" class="view-item-button bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Läs mer & Ansök</button>
+                            ${(loggedInUser && (loggedInUser.personalNumber === job.creatorPersonalNumber || loggedInUser.role === 'admin')) ?
+                                `<button data-id="${job.id}" data-type="job" class="delete-item-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 ml-2">Ta bort</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                jobListingsContainer.appendChild(jobCard);
+            });
+
+            document.querySelectorAll('.view-item-button[data-type="job"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const jobId = parseInt(e.target.dataset.id);
+                    const job = jobListings.find(j => j.id === jobId);
+                    if (job) {
+                        const creatorName = characters.find(char => char.personalNumber === job.creatorPersonalNumber)?.characterName || 'Okänd';
+
+                        jobDetailTitle.textContent = job.title;
+                        jobDetailImage.src = job.imageUrl || 'https://placehold.co/300x200/a78bfa/ffffff?text=Jobbannonsbild';
+                        jobDetailDescription.textContent = job.description;
+                        jobDetailRequirements.textContent = job.requirements || 'Inga specifika krav angivna.';
+                        jobDetailCreator.textContent = creatorName;
+                        jobDetailCreatorPn.textContent = job.creatorPersonalNumber;
+                        jobDetailDate.textContent = new Date(job.timestamp).toLocaleDateString();
+                        jobApplyForm.dataset.jobId = job.id; // Använd ID istället för index
+                        jobDetailModal.style.display = 'flex';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-item-button[data-type="job"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const jobId = parseInt(e.target.dataset.id);
+                    currentDeleteItem = { id: jobId, type: 'job' };
+                    confirmationMessage.textContent = 'Är du säker på att du vill ta bort denna jobbannons?';
+                    confirmationModal.style.display = 'flex';
+                });
+            });
+        }
+
+        openJobPostButton.addEventListener('click', () => {
+            if (!loggedInUser) {
+                showMessage('Du måste logga in för att lägga ut jobbannonser.', 'error');
+                loginModal.style.display = 'flex';
+                return;
+            }
+            jobPostModal.style.display = 'flex';
+            jobPostForm.reset();
+            jobImagePreview.src = "https://placehold.co/300x200/e0e7ff/6366f1?text=Jobbannonsbild"; // Återställ förhandsvisning
+        });
+        closeJobPostModalButton.addEventListener('click', () => { jobPostModal.style.display = 'none'; });
+
+        jobImageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    jobImagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                jobImagePreview.src = "https://placehold.co/300x200/e0e7ff/6366f1?text=Jobbannonsbild";
+            }
+        });
+
+        jobPostForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newJob = {
+                id: Date.now(),
+                title: document.getElementById('job-title').value,
+                imageUrl: jobImagePreview.src, // Spara den uppladdade bilden
+                description: document.getElementById('job-description').value,
+                requirements: document.getElementById('job-requirements').value,
+                creatorPersonalNumber: loggedInUser.personalNumber,
+                timestamp: new Date().toISOString()
+            };
+            jobListings.push(newJob);
+            localStorage.setItem('algholmJobListings', JSON.stringify(jobListings));
+            renderJobListings();
+            showMessage('Jobbannons publicerad!', 'success');
+            showNotification('Nytt Jobb!', `"${newJob.title}" har annonserats!`);
+            jobPostModal.style.display = 'none';
+        });
+
+        closeJobDetailModalButton.addEventListener('click', () => { jobDetailModal.style.display = 'none'; });
+        jobApplyForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const jobId = parseInt(e.target.dataset.jobId); // Använd ID
+            const job = jobListings.find(j => j.id === jobId);
+            if (!job) {
+                showMessage('Jobbannonsen hittades inte.', 'error');
+                return;
+            }
+            const applicantName = document.getElementById('applicant-name').value;
+            const applicantPersonalNumber = document.getElementById('applicant-personal-number').value;
+            const applicantMotivation = document.getElementById('applicant-motivation').value;
+
+            // Hitta mottagaren (den som skapade jobbannonsen)
+            const recipientPersonalNumber = job.creatorPersonalNumber;
+            const recipientCharIndex = characters.findIndex(char => char.personalNumber === recipientPersonalNumber);
+
+            if (recipientCharIndex === -1) {
+                showMessage('Kunde inte hitta personen som annonserade jobbet.', 'error');
+                return;
+            }
+
+            // Skapa meddelandeinnehållet
+            const messageContent = `Ansökan till ditt jobb "${job.title}" från ${applicantName} (PN: ${applicantPersonalNumber}).\n\nMotivation:\n${applicantMotivation}`;
+
+            const newMessage = {
+                senderPersonalNumber: applicantPersonalNumber, // Sökanden är avsändaren
+                recipientPersonalNumber: recipientPersonalNumber,
+                message: messageContent,
+                timestamp: new Date().toISOString(),
+                read: false,
+                type: 'job_application' // Valfritt: Lägg till en typ för enklare filtrering/visning senare
+            };
+
+            // Lägg till meddelandet i mottagarens receivedMessages
+            characters[recipientCharIndex].receivedMessages = characters[recipientCharIndex].receivedMessages || [];
+            characters[recipientCharIndex].receivedMessages.push(newMessage);
+            localStorage.setItem('algholmCharacters', JSON.stringify(characters));
+
+            // Lägg även till i den globala meddelandeloggen för admin
+            globalMessages.push(newMessage);
+            localStorage.setItem('algholmGlobalMessages', JSON.stringify(globalMessages));
+
+            // Om mottagaren är den för närvarande inloggade användaren, uppdatera deras vy
+            if (loggedInUser && loggedInUser.personalNumber === recipientPersonalNumber) {
+                loggedInUser.receivedMessages = characters[recipientCharIndex].receivedMessages;
+                localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+                displayReceivedMessages(); // Rendera om meddelandena i Mitt Älgholm
+            }
+
+            showMessage(`Din ansökan till "${job.title}" har skickats till ${characters[recipientCharIndex].characterName}!`, 'success');
+            showNotification('Ny Jobbansökan!', `Ansökan till "${job.title}" har skickats.`);
+            jobDetailModal.style.display = 'none';
+            jobApplyForm.reset();
+        });
+
+
+        // --- Dynamiska Husannonser ---
+        function renderHousingListings() {
+            dynamicHousingListingsContainer.innerHTML = ''; // Rensa endast dynamiska listor
+            if (housingListings.length === 0) {
+                dynamicHousingListingsContainer.innerHTML = '<p class="text-gray-500 col-span-full text-center">Inga hus annonserade än.</p>';
+                return;
+            }
+
+            housingListings.forEach((house, index) => {
+                const creatorName = characters.find(char => char.personalNumber === house.creatorPersonalNumber)?.characterName || 'Okänd';
+                const houseCard = document.createElement('div');
+                houseCard.classList.add('dynamic-card', 'bg-green-50');
+                houseCard.innerHTML = `
+                    <img src="${house.imageUrl || 'https://placehold.co/400x250/e0e7ff/6366f1?text=Husbild'}" alt="${house.title}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Bild+saknas';">
+                    <div class="p-6">
+                        <h3 class="dynamic-card-title">${house.title}</h3>
+                        <p class="dynamic-card-description">${house.description.substring(0, 100)}...</p>
+                        <p class="text-gray-600 text-sm mb-4">Hyra: ${house.rentAmount} kr/mån</p>
+                        <p class="text-gray-600 text-sm mb-4">Annonserad av: ${creatorName}</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <button data-id="${house.id}" data-type="housing" class="view-item-button bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info</button>
+                            ${(loggedInUser && (loggedInUser.personalNumber === house.creatorPersonalNumber || loggedInUser.role === 'admin')) ?
+                                `<button data-id="${house.id}" data-type="housing" class="delete-item-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 ml-2">Ta bort</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                dynamicHousingListingsContainer.appendChild(houseCard);
+            });
+
+            // Re-attach event listeners for dynamic buttons
+            document.querySelectorAll('.view-item-button[data-type="housing"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const housingId = parseInt(e.target.dataset.id);
+                    const house = housingListings.find(h => h.id === housingId);
+                    if (house) {
+                        const creatorName = characters.find(char => char.personalNumber === house.creatorPersonalNumber)?.characterName || 'Okänd';
+
+                        housingDetailTitle.textContent = house.title;
+                        housingDetailImage.src = house.imageUrl || 'https://placehold.co/300x200/e0e7ff/6366f1?text=Husbild';
+                        housingDetailDescription.textContent = house.description;
+                        housingDetailRent.textContent = house.rentAmount; // Ensure rent is displayed
+                        housingDetailCreator.textContent = creatorName;
+                        housingDetailCreatorPn.textContent = house.creatorPersonalNumber;
+                        housingDetailDate.textContent = new Date(house.timestamp).toLocaleDateString();
+                        contactLandlordButton.dataset.landlordPn = house.creatorPersonalNumber; // Spara PN för meddelande
+                        housingDetailModal.style.display = 'flex';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-item-button[data-type="housing"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const housingId = parseInt(e.target.dataset.id);
+                    currentDeleteItem = { id: housingId, type: 'housing' };
+                    confirmationMessage.textContent = 'Är du säker på att du vill ta bort denna husannons?';
+                    confirmationModal.style.display = 'flex';
+                });
+            });
+        }
+
+        openHouseRentalButton.addEventListener('click', () => {
+            if (!loggedInUser) {
+                showMessage('Du måste logga in för att lägga ut husannonser.', 'error');
+                loginModal.style.display = 'flex';
+                return;
+            }
+            houseRentalModal.style.display = 'flex';
+            houseRentalForm.reset();
+            houseImageDisplay.src = "https://placehold.co/300x200/e0e7ff/6366f1?text=Husbild"; // Återställ platshållarbilden
+        });
+        closeHouseRentalModalButton.addEventListener('click', () => { houseRentalModal.style.display = 'none'; });
+        
+        houseImageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    houseImageDisplay.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                houseImageDisplay.src = "https://placehold.co/300x200/e0e7ff/6366f1?text=Husbild";
+            }
+        });
+
+        houseRentalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newHouse = {
+                id: Date.now(),
+                title: document.getElementById('house-title').value,
+                imageUrl: houseImageDisplay.src, // Spara den uppladdade bilden
+                rentAmount: document.getElementById('house-rent-amount').value,
+                description: document.getElementById('house-description').value,
+                creatorPersonalNumber: loggedInUser.personalNumber,
+                timestamp: new Date().toISOString()
+            };
+            housingListings.push(newHouse);
+            localStorage.setItem('algholmHousingListings', JSON.stringify(housingListings));
+            renderHousingListings();
+            showMessage('Husannons publicerad!', 'success');
+            showNotification('Nytt Hus!', `"${newHouse.title}" har lagts ut för uthyrning!`);
+            houseRentalModal.style.display = 'none';
+        });
+
+        closeHousingDetailModalButton.addEventListener('click', () => { housingDetailModal.style.display = 'none'; });
+        contactLandlordButton.addEventListener('click', (e) => {
+            if (!loggedInUser) {
+                showMessage('Du måste logga in för att skicka meddelanden.', 'error');
+                loginModal.style.display = 'flex';
+                return;
+            }
+            const landlordPn = e.target.dataset.landlordPn;
+            document.getElementById('recipient-personal-number').value = landlordPn;
+            messageSendModal.style.display = 'flex';
+            housingDetailModal.style.display = 'none'; // Stäng husdetaljmodulen
+            hideMessage();
+        });
+
+        // --- Dynamiska RP-sessioner ---
+        function renderRPSessions() {
+            rpSessionsListingsContainer.innerHTML = '';
+            if (rpSessions.length === 0) {
+                rpSessionsListingsContainer.innerHTML = '<p class="text-gray-500 col-span-full text-center">Inga RP-sessioner planerade än.</p>';
+                return;
+            }
+
+            // Sortera efter datum och tid
+            const sortedSessions = [...rpSessions].sort((a, b) => {
+                const dateTimeA = new Date(`${a.date}T${a.time}`);
+                const dateTimeB = new Date(`${b.date}T${b.time}`);
+                return dateTimeA - dateTimeB;
+            });
+
+            sortedSessions.forEach((session, index) => {
+                const creatorName = characters.find(char => char.personalNumber === session.creatorPersonalNumber)?.characterName || 'Okänd';
+                const sessionCard = document.createElement('div');
+                sessionCard.classList.add('dynamic-card', 'bg-yellow-50');
+                sessionCard.innerHTML = `
+                    <div class="p-6">
+                        <i class="fas fa-users text-5xl text-yellow-600 mb-4"></i>
+                        <h3 class="dynamic-card-title">${session.title}</h3>
+                        <p class="text-gray-700 mb-2"><strong>Datum:</strong> ${session.date}</p>
+                        <p class="text-gray-700 mb-4"><strong>Tid:</strong> ${session.time}</p>
+                        <p class="dynamic-card-description">${session.description.substring(0, 100)}...</p>
+                        <p class="text-gray-600 text-sm mb-4">Skapad av: ${creatorName}</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <button data-id="${session.id}" data-type="rp-session" class="view-item-button bg-yellow-600 hover:bg-yellow-700 text-blue-900 font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Mer info & Anmäl dig</button>
+                            ${(loggedInUser && (loggedInUser.personalNumber === session.creatorPersonalNumber || loggedInUser.role === 'admin')) ?
+                                `<button data-id="${session.id}" data-type="rp-session" class="delete-item-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 ml-2">Ta bort</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                rpSessionsListingsContainer.appendChild(sessionCard);
+            });
+
+            document.querySelectorAll('.view-item-button[data-type="rp-session"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const sessionId = parseInt(e.target.dataset.id);
+                    const session = rpSessions.find(s => s.id === sessionId);
+                    if (session) {
+                        const creatorName = characters.find(char => char.personalNumber === session.creatorPersonalNumber)?.characterName || 'Okänd';
+
+                        rpSessionDetailTitle.textContent = session.title;
+                        rpSessionDetailDate.textContent = session.date;
+                        rpSessionDetailTime.textContent = session.time;
+                        rpSessionDetailDescription.textContent = session.description;
+                        rpSessionDetailMaxParticipants.textContent = session.maxParticipants || 'Obegränsat';
+                        rpSessionDetailCreator.textContent = creatorName;
+                        rpSessionDetailCreatorPn.textContent = session.creatorPersonalNumber;
+                        rpSessionDetailCreatedDate.textContent = new Date(session.timestamp).toLocaleDateString();
+
+                        rpSessionSignupButton.onclick = () => {
+                            if (!loggedInUser) {
+                                showMessage('Du måste logga in för att anmäla dig.', 'error');
+                                loginModal.style.display = 'flex';
+                                return;
+                            }
+                            showMessage(`Du har anmält dig till RP-sessionen "${session.title}"!`, 'success');
+                            rpSessionDetailModal.style.display = 'none';
+                            // I en riktig app skulle detta sparas i databasen för sessionen
+                        };
+                        rpSessionDetailModal.style.display = 'flex';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-item-button[data-type="rp-session"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const sessionId = parseInt(e.target.dataset.id);
+                    currentDeleteItem = { id: sessionId, type: 'rp-session' };
+                    confirmationMessage.textContent = 'Är du säker på att du vill ta bort denna RP-session?';
+                    confirmationModal.style.display = 'flex';
+                });
+            });
+        }
+
+        openRpSessionCreateButton.addEventListener('click', () => {
+            if (!loggedInUser || loggedInUser.role !== 'admin') {
+                showMessage('Endast administratörer kan skapa RP-sessioner.', 'error');
+                return;
+            }
+            rpSessionCreateModal.style.display = 'flex';
+            rpSessionCreateForm.reset();
+        });
+        closeRpSessionCreateModalButton.addEventListener('click', () => { rpSessionCreateModal.style.display = 'none'; });
+        rpSessionCreateForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newSession = {
+                id: Date.now(),
+                title: document.getElementById('rp-session-title').value,
+                date: document.getElementById('rp-session-date').value,
+                time: document.getElementById('rp-session-time').value,
+                description: document.getElementById('rp-session-description').value,
+                maxParticipants: document.getElementById('rp-session-max-participants').value || null,
+                creatorPersonalNumber: loggedInUser.personalNumber,
+                timestamp: new Date().toISOString()
+            };
+            rpSessions.push(newSession);
+            localStorage.setItem('algholmRPSessions', JSON.stringify(rpSessions));
+            renderRPSessions();
+            showMessage('RP-session skapad!', 'success');
+            showNotification('Ny RP-session!', `"${newSession.title}" har planerats!`);
+            rpSessionCreateModal.style.display = 'none';
+        });
+        closeRpSessionDetailModalButton.addEventListener('click', () => { rpSessionDetailModal.style.display = 'none'; });
+
+
+        // --- Nyhetskanal ---
+        function renderNewsArticles() {
+            newsArticlesContainer.innerHTML = '';
+            if (newsArticles.length === 0) {
+                newsArticlesContainer.innerHTML = '<p class="text-gray-500 col-span-full text-center">Inga nyhetsartiklar publicerade än.</p>';
+                return;
+            }
+
+            // Sortera efter senaste först
+            const sortedNews = [...newsArticles].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            sortedNews.forEach((article, index) => {
+                const creatorName = characters.find(char => char.personalNumber === article.creatorPersonalNumber)?.characterName || 'Okänd';
+                const newsCard = document.createElement('div');
+                newsCard.classList.add('dynamic-card', 'bg-gray-50');
+                newsCard.innerHTML = `
+                    <img src="${article.imageUrl || 'https://placehold.co/400x250/d1fae5/065f46?text=Nyhetsbild'}" alt="${article.title}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/333333?text=Bild+saknas';">
+                    <div class="p-6">
+                        <h3 class="dynamic-card-title">${article.title}</h3>
+                        <p class="dynamic-card-description">${article.content.substring(0, 150)}...</p>
+                        <p class="text-gray-600 text-sm mt-2">Publicerad av: ${creatorName} den ${new Date(article.timestamp).toLocaleDateString()}</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <button data-id="${article.id}" data-type="news-article" class="view-item-button bg-yellow-600 hover:bg-yellow-700 text-blue-900 font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Läs hela artikeln</button>
+                            ${(loggedInUser && (loggedInUser.personalNumber === article.creatorPersonalNumber || loggedInUser.role === 'admin')) ?
+                                `<button data-id="${article.id}" data-type="news-article" class="delete-item-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300 ml-2">Ta bort</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                newsArticlesContainer.appendChild(newsCard);
+            });
+
+            document.querySelectorAll('.view-item-button[data-type="news-article"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const articleId = parseInt(e.target.dataset.id);
+                    const article = newsArticles.find(a => a.id === articleId);
+                    if (article) {
+                        const creatorName = characters.find(char => char.personalNumber === article.creatorPersonalNumber)?.characterName || 'Okänd';
+
+                        newsDetailTitle.textContent = article.title;
+                        newsDetailImage.src = article.imageUrl || 'https://placehold.co/400x250/d1fae5/065f46?text=Nyhetsbild';
+                        newsDetailContent.textContent = article.content;
+                        newsDetailCreator.textContent = creatorName;
+                        newsDetailCreatorPn.textContent = article.creatorPersonalNumber;
+                        newsDetailDate.textContent = new Date(article.timestamp).toLocaleDateString();
+                        newsDetailModal.style.display = 'flex';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-item-button[data-type="news-article"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const articleId = parseInt(e.target.dataset.id);
+                    currentDeleteItem = { id: articleId, type: 'news-article' };
+                    confirmationMessage.textContent = 'Är du säker på att du vill ta bort denna nyhetsartikel?';
+                    confirmationModal.style.display = 'flex';
+                });
+            });
+        }
+
+        openNewsCreateButton.addEventListener('click', () => {
+            if (!loggedInUser || loggedInUser.role !== 'admin') {
+                showMessage('Endast administratörer kan skapa nyheter.', 'error');
+                return;
+            }
+            newsCreateModal.style.display = 'flex';
+            newsCreateForm.reset();
+            newsImagePreview.src = "https://placehold.co/300x200/d1fae5/065f46?text=Nyhetsbild"; // Återställ förhandsvisning
+        });
+        closeNewsCreateModalButton.addEventListener('click', () => { newsCreateModal.style.display = 'none'; });
+        
+        newsImageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    newsImagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                newsImagePreview.src = "https://placehold.co/300x200/d1fae5/065f46?text=Nyhetsbild";
+            }
+        });
+
+        newsCreateForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newArticle = {
+                id: Date.now(),
+                title: document.getElementById('news-title').value,
+                imageUrl: newsImagePreview.src, // Spara den uppladdade bilden
+                content: document.getElementById('news-content').value,
+                creatorPersonalNumber: loggedInUser.personalNumber,
+                timestamp: new Date().toISOString()
+            };
+            newsArticles.push(newArticle);
+            localStorage.setItem('algholmNewsArticles', JSON.stringify(newsArticles));
+            renderNewsArticles();
+            showMessage('Nyhetsartikel publicerad!', 'success');
+            showNotification('Nyhet!', `"${newArticle.title}" har publicerats!`);
+            newsCreateModal.style.display = 'none';
+        });
+        closeNewsDetailModalButton.addEventListener('click', () => { newsDetailModal.style.display = 'none'; });
+
+
+        // --- Generella Event Listeners ---
+        navToggle.addEventListener('click', () => {
+            navContent.classList.toggle('hidden');
+            navContent.classList.toggle('block');
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = e.target.dataset.section;
+                if (sectionId) {
+                    if (sectionId === 'my-algholm' && !loggedInUser) {
+                        showMessage('Du måste logga in för att se "Mitt Älgholm".', 'error');
+                        loginModal.style.display = 'flex';
+                        return;
+                    }
+                    showSection(sectionId);
+                }
+            });
+        });
+
+        homeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('home');
+        });
+
+        loginButton.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+            hideMessage();
+        });
+        homeLoginButton.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+            hideMessage();
+        });
+
+        closeModalButton.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == loginModal) loginModal.style.display = 'none';
+            if (event.target == hotelDetailsModal) hotelDetailsModal.style.display = 'none';
+            if (event.target == karlssonsEkonomiModal) karlssonsEkonomiModal.style.display = 'none';
+            if (event.target == karlssonsKorskolaModal) karlssonsKorskolaModal.style.display = 'none';
+            if (event.target == karlssonsJuridikModal) karlssonsJuridikModal.style.display = 'none';
+            if (event.target == dinAdvokatModal) dinAdvokatModal.style.display = 'none';
+            if (event.target == messageSendModal) messageSendModal.style.display = 'none';
+            if (event.target == jobPostModal) jobPostModal.style.display = 'none';
+            if (event.target == jobDetailModal) jobDetailModal.style.display = 'none';
+            if (event.target == houseRentalModal) houseRentalModal.style.display = 'none';
+            if (event.target == housingDetailModal) housingDetailModal.style.display = 'none';
+            if (event.target == rpSessionCreateModal) rpSessionCreateModal.style.display = 'none';
+            if (event.target == rpSessionDetailModal) rpSessionDetailModal.style.display = 'none';
+            if (event.target == newsCreateModal) newsCreateModal.style.display = 'none';
+            if (event.target == newsDetailModal) newsDetailModal.style.display = 'none';
+            if (event.target == emporiaDetailsModal) emporiaDetailsModal.style.display = 'none'; // Ny för Emporia
+            if (event.target == adminMessageLogModal) adminMessageLogModal.style.display = 'none'; // Ny för admin meddelandelogg
+            if (event.target == adminUserManagementModal) adminUserManagementModal.style.display = 'none'; // Ny för admin användarhantering
+            if (event.target == sjukvardModal) sjukvardModal.style.display = 'none';
+            if (event.target == polisModal) polisModal.style.display = 'none';
+            if (event.target == borgmastareModal) borgmastareModal.style.display = 'none';
+            if (event.target == korskolaModal) korskolaModal.style.display = 'none';
+            if (event.target == confirmationModal) confirmationModal.style.display = 'none'; // Ny för bekräftelsemodal
+        });
+
+        loginTabButton.addEventListener('click', () => {
+            loginTabButton.classList.add('active');
+            registerTabButton.classList.remove('active');
+            loginFormContainer.classList.remove('hidden');
+            registerFormContainer.classList.add('hidden');
+            hideMessage();
+        });
+
+        registerTabButton.addEventListener('click', () => {
+            registerTabButton.classList.add('active');
+            loginTabButton.classList.remove('active');
+            registerFormContainer.classList.remove('hidden');
+            loginFormContainer.classList.add('hidden');
+            hideMessage();
+        });
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const characterName = document.getElementById('character-name').value;
+            const discordName = document.getElementById('discord-name').value;
+            const characterType = document.getElementById('character-type').value;
+            const dreamJob = document.getElementById('dream-job').value;
+            const personalNumber = Math.floor(100000 + Math.random() * 900000).toString();
+
+            const newCharacter = {
+                characterName,
+                discordName,
+                characterType,
+                dreamJob,
+                personalNumber,
+                profilePicture: null,
+                receivedMessages: [],
+                role: 'user' // Standardroll för nya konton
+            };
+
+            characters.push(newCharacter);
+            localStorage.setItem('algholmCharacters', JSON.stringify(characters));
+
+            loggedInUser = newCharacter;
+            localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+
+            showMessage(`Konto skapat! Ditt personnummer är: ${personalNumber}. Du är nu inloggad som ${characterName}.`, 'success');
+            updateNavigation();
+            updateMyAlgholmSection();
+            loginModal.style.display = 'none';
+            showSection('my-algholm');
+
+            registerForm.reset();
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const personalNumber = document.getElementById('login-personal-number').value;
+            const foundCharacter = characters.find(char => char.personalNumber === personalNumber);
+
+            if (foundCharacter) {
+                loggedInUser = foundCharacter;
+                localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+                showMessage(`Välkommen tillbaka, ${loggedInUser.characterName}!`, 'success');
+                updateNavigation();
+                updateMyAlgholmSection();
+                loginModal.style.display = 'none';
+                showSection('my-algholm');
+            } else {
+                showMessage('Personnummer hittades inte. Försök igen eller skapa ett nytt konto.', 'error');
+            }
+            loginForm.reset();
+        });
+
+        logoutButton.addEventListener('click', () => {
+            loggedInUser = null;
+            localStorage.removeItem('loggedInUser');
+            updateNavigation();
+            showSection('home');
+            showMessage('Du har loggats ut.', 'success');
+        });
+
+        uploadProfilePicButton.addEventListener('click', () => {
+            profilePictureInput.click();
+        });
+
+        profilePictureInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePictureDisplay.src = e.target.result;
+                    if (loggedInUser) {
+                        loggedInUser.profilePicture = e.target.result;
+                        const charIndex = characters.findIndex(char => char.personalNumber === loggedInUser.personalNumber);
+                        if (charIndex !== -1) {
+                            characters[charIndex].profilePicture = e.target.result;
+                            localStorage.setItem('algholmCharacters', JSON.stringify(characters));
+                        }
+                        localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+                        showMessage('Profilbild uppdaterad!', 'success');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        openHotelDetailsButton.addEventListener('click', () => { hotelDetailsModal.style.display = 'flex'; });
+        closeHotelDetailsModalButton.addEventListener('click', () => { hotelDetailsModal.style.display = 'none'; });
+
+        openKarlssonsEkonomiButton.addEventListener('click', () => { karlssonsEkonomiModal.style.display = 'flex'; });
+        closeKarlssonsEkonomiModalButton.addEventListener('click', () => { karlssonsEkonomiModal.style.display = 'none'; });
+
+        openKarlssonsKorskolaButton.addEventListener('click', () => { karlssonsKorskolaModal.style.display = 'flex'; });
+        closeKarlssonsKorskolaModalButton.addEventListener('click', () => { karlssonsKorskolaModal.style.display = 'none'; });
+
+        openKarlssonsJuridikButton.addEventListener('click', () => { karlssonsJuridikModal.style.display = 'flex'; });
+        closeKarlssonsJuridikModalButton.addEventListener('click', () => { karlssonsJuridikModal.style.display = 'none'; });
+
+        openDinAdvokatButton.addEventListener('click', () => { dinAdvokatModal.style.display = 'flex'; });
+        closeDinAdvokatModalButton.addEventListener('click', () => { dinAdvokatModal.style.display = 'none'; });
+
+        openSchoolFromMunicipalityButton.addEventListener('click', () => { showSection('school'); });
+
+        openEmporiaButton.addEventListener('click', () => { emporiaDetailsModal.style.display = 'flex'; });
+        closeEmporiaDetailsModalButton.addEventListener('click', () => { emporiaDetailsModal.style.display = 'none'; });
+
+
+        sendMessageButton.addEventListener('click', () => {
+            if (!loggedInUser) {
+                showMessage('Du måste logga in för att skicka meddelanden.', 'error');
+                loginModal.style.display = 'flex';
+                return;
+            }
+            document.getElementById('recipient-personal-number').value = ''; // Rensa fältet
+            document.getElementById('message-content').value = ''; // Rensa fältet
+            messageSendModal.style.display = 'flex';
+            hideMessage();
+        });
+
+        closeMessageSendModalButton.addEventListener('click', () => { messageSendModal.style.display = 'none'; });
+
+        messageSendForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const recipientPersonalNumber = document.getElementById('recipient-personal-number').value;
+            const messageContent = document.getElementById('message-content').value;
+
+            const recipientCharIndex = characters.findIndex(char => char.personalNumber === recipientPersonalNumber);
+
+            if (recipientCharIndex === -1) {
+                showMessage('Mottagarens personnummer hittades inte.', 'error');
+                return;
+            }
+
+            const senderName = loggedInUser.characterName || 'Okänd Avsändare';
+
+            const newMessage = {
+                senderPersonalNumber: loggedInUser.personalNumber,
+                recipientPersonalNumber: recipientPersonalNumber, // Lägg till mottagarens PN
+                message: messageContent,
+                timestamp: new Date().toISOString(),
+                read: false
+            };
+
+            // Lägg till meddelandet hos mottagaren
+            characters[recipientCharIndex].receivedMessages = characters[recipientCharIndex].receivedMessages || [];
+            characters[recipientCharIndex].receivedMessages.push(newMessage);
+            localStorage.setItem('algholmCharacters', JSON.stringify(characters));
+
+            // Lägg till meddelandet i den globala loggen
+            globalMessages.push(newMessage);
+            localStorage.setItem('algholmGlobalMessages', JSON.stringify(globalMessages));
+
+
+            if (loggedInUser.personalNumber === recipientPersonalNumber) {
+                loggedInUser.receivedMessages = characters[recipientCharIndex].receivedMessages;
+                localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+                displayReceivedMessages();
+                showNotification(`Nytt meddelande från dig själv!`, messageContent);
+            } else {
+                showNotification(`Nytt meddelande!`, `Från ${senderName} till ${characters[recipientCharIndex].characterName}.`);
+            }
+
+
+            showMessage(`Meddelande skickat till ${characters[recipientCharIndex].characterName}!`, 'success');
+            messageSendModal.style.display = 'none';
+            messageSendForm.reset();
+        });
+
+        markAllReadButton.addEventListener('click', () => {
+            if (loggedInUser && loggedInUser.receivedMessages) {
+                loggedInUser.receivedMessages.forEach(msg => {
+                    msg.read = true;
+                });
+                const charIndex = characters.findIndex(char => char.personalNumber === loggedInUser.personalNumber);
+                if (charIndex !== -1) {
+                    characters[charIndex] = { ...loggedInUser };
+                    localStorage.setItem('algholmCharacters', JSON.stringify(characters));
+                    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+                }
+                displayReceivedMessages();
+                showMessage('Alla meddelanden markerade som lästa.', 'success');
+            }
+        });
+
+        viewAdminMessagesButton.addEventListener('click', () => {
+            if (!loggedInUser || loggedInUser.role !== 'admin') {
+                showMessage('Du har inte behörighet att se den globala meddelandeloggen.', 'error');
+                return;
+            }
+            displayGlobalMessagesForAdmin();
+            adminMessageLogModal.style.display = 'flex';
+        });
+        closeAdminMessageLogModalButton.addEventListener('click', () => { adminMessageLogModal.style.display = 'none'; });
+
+        // Event listener for static Central Apartment button
+        if (openCentralApartmentButton) { // Check if the element exists
+            openCentralApartmentButton.addEventListener('click', () => {
+                housingDetailTitle.textContent = 'Central Lägenhet';
+                housingDetailImage.src = 'https://placehold.co/400x250/a78bfa/ffffff?text=Lägenhet';
+                housingDetailDescription.textContent = 'En modern lägenhet i hjärtat av Älgholm, perfekt för singlar eller par. Nära till allt!';
+                housingDetailRent.textContent = '5,000';
+                housingDetailCreator.textContent = 'Älgholm Bostäder';
+                housingDetailCreatorPn.textContent = '000001'; // Placeholder PN
+                housingDetailDate.textContent = '2025-01-01'; // Placeholder date
+                contactLandlordButton.dataset.landlordPn = '000001';
+                housingDetailModal.style.display = 'flex';
+            });
+        }
+
+        // --- Admin Användarhantering ---
+        document.getElementById('open-admin-user-management-button').addEventListener('click', () => {
+            if (!loggedInUser || loggedInUser.role !== 'admin') {
+                showMessage('Endast administratörer kan hantera användare.', 'error');
+                return;
+            }
+            renderUserListForAdmin();
+            adminUserManagementModal.style.display = 'flex';
+        });
+        closeAdminUserManagementModalButton.addEventListener('click', () => {
+            adminUserManagementModal.style.display = 'none';
+        });
+
+        function renderUserListForAdmin() {
+            userListForAdmin.innerHTML = '';
+            if (characters.length === 0) {
+                noUsersText.classList.remove('hidden');
+                return;
+            }
+            noUsersText.classList.add('hidden');
+
+            characters.forEach((char, index) => {
+                const userItem = document.createElement('div');
+                userItem.classList.add('bg-gray-100', 'p-4', 'rounded-lg', 'shadow-sm', 'flex', 'flex-col', 'md:flex-row', 'justify-between', 'items-center', 'mb-3');
+                userItem.innerHTML = `
+                    <div class="text-left mb-2 md:mb-0">
+                        <p class="font-bold text-lg">${char.characterName} (${char.personalNumber})</p>
+                        <p class="text-sm text-gray-600">Discord: ${char.discordName || 'Ej angivet'}</p>
+                        <p class="text-sm text-gray-600">Nuvarande roll: <span id="role-display-${char.personalNumber}" class="font-semibold text-purple-700">${char.role ? char.role.charAt(0).toUpperCase() + char.role.slice(1) : 'Användare'}</span></p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <select data-personal-number="${char.personalNumber}" class="role-select bg-white border border-gray-300 rounded-md py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="user" ${char.role === 'user' ? 'selected' : ''}>Användare</option>
+                            <option value="sjukvard" ${char.role === 'sjukvard' ? 'selected' : ''}>Sjukvård</option>
+                            <option value="polis" ${char.role === 'polis' ? 'selected' : ''}>Polis</option>
+                            <option value="borgmastare" ${char.role === 'borgmastare' ? 'selected' : ''}>Borgmästare</option>
+                            <option value="korskola" ${char.role === 'korskola' ? 'selected' : ''}>Körskola</option>
+                            <option value="admin" ${char.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                        <button data-personal-number="${char.personalNumber}" class="assign-role-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-all duration-300">Tilldela roll</button>
+                    </div>
+                `;
+                userListForAdmin.appendChild(userItem);
+            });
+
+            document.querySelectorAll('.assign-role-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const personalNumber = e.target.dataset.personalNumber;
+                    const roleSelect = e.target.closest('.flex').querySelector('.role-select');
+                    const newRole = roleSelect.value;
+                    assignRole(personalNumber, newRole);
+                });
+            });
+        }
+
+        function assignRole(personalNumber, newRole) {
+            const charIndex = characters.findIndex(char => char.personalNumber === personalNumber);
+            if (charIndex !== -1) {
+                characters[charIndex].role = newRole;
+                localStorage.setItem('algholmCharacters', JSON.stringify(characters));
+                // Om den inloggade användaren är den som får rollen, uppdatera även loggedInUser
+                if (loggedInUser && loggedInUser.personalNumber === personalNumber) {
+                    loggedInUser.role = newRole;
+                    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+                    updateMyAlgholmSection(); // Uppdatera "Mitt Älgholm" direkt
+                }
+                renderUserListForAdmin(); // Uppdatera listan i admin-modalen
+                showMessage(`Roll uppdaterad för ${characters[charIndex].characterName} till ${newRole.charAt(0).toUpperCase() + newRole.slice(1)}.`, 'success');
+            } else {
+                showMessage('Kunde inte hitta användaren.', 'error');
+            }
+        }
+
+        // --- Roll-specifika sidor och deras logik ---
+        // Sjukvård Modal
+        closeSjukvardModalButton.addEventListener('click', () => { sjukvardModal.style.display = 'none'; });
+
+        sjukvardTabButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tab = e.target.dataset.tab;
+                sjukvardTabButtons.forEach(btn => btn.classList.remove('active', 'bg-blue-700', 'text-white', 'bg-gray-200', 'text-gray-700'));
+                sjukvardContentSections.forEach(section => section.classList.remove('active'));
+
+                e.target.classList.add('active', 'bg-blue-700', 'text-white');
+                e.target.classList.remove('bg-gray-200', 'text-gray-700');
+                document.getElementById(`sjukvard-${tab}-content`).classList.add('active');
+
+                if (tab === 'journal') {
+                    renderSjukvardJournal();
+                } else if (tab === 'important') {
+                    sjukvardImportantSubcontent.innerHTML = '<p>Välj en kategori för att se viktig information.</p>';
+                    sjukvardImportantButtons.forEach(btn => {
+                        btn.classList.remove('bg-green-700', 'bg-purple-700', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                }
+            });
+        });
+
+        sjukvardImportantButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const subtab = e.target.dataset.subtab;
+                sjukvardImportantButtons.forEach(btn => {
+                    btn.classList.remove('bg-green-700', 'bg-purple-700', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                e.target.classList.add('active');
+                if (subtab === 'rules') {
+                    e.target.classList.add('bg-green-700', 'text-white');
+                    e.target.classList.remove('bg-gray-200', 'text-gray-700');
+                    sjukvardImportantSubcontent.innerHTML = `
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">Regler för Sjukvårdspersonal</h4>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li><strong>Vårdhygien:</strong> All personal ska följa fastställda hygienrutiner, inklusive korrekt handtvätt och handdesinfektion före och efter varje patientkontakt. Kontroll sker via regelbundna observationer och avvikelsehantering.</li>
+                            <li><strong>Tystnadspolicy:</strong> Specifika tysta zoner ska utformas inom vårdavdelningar för att främja patienternas vila och återhämtning. Skyltar och personalinstruktioner säkerställer efterlevnad.</li>
+                            <li><strong>Språkkrav:</strong> Alla anställda ska kunna kommunicera på svenska på en nivå som möjliggör säker och effektiv vård. Språktest kan krävas vid nyanställning.</li>
+                            <li><strong>Personalbemanning:</strong> Miniminivåer ska följas för bemanning per avdelning. Detta säkerställer patientsäkerhet och minskar risken för personalens utbrändhet.</li>
+                            <li><strong>Patientjournalföring:</strong> Alla vårdkontakter och åtgärder ska dokumenteras i digital journal inom 24 timmar. Journalkvalitet ska följas upp regelbundet.</li>
+                            <li><strong>Besökstider:</strong> Sjukhus kan ha fasta besökstider, men med undantag för patienter i kritiskt tillstånd eller vid palliativ vård. Tydlig kommunikation till anhöriga är avgörande.</li>
+                            <li><strong>Vaccinationskrav:</strong> Vissa personal måste ha vaccinationsskydd mot t.ex. hepatit B och influensa. Ovaccinerade kan behöva använda extra skyddsutrustning.</li>
+                            <li><strong>Miljökrav:</strong> Sjukhus ska källsortera avfall, minska plastanvändning och följa regionens miljöpolicy för att minska klimatpåverkan.</li>
+                            <li><strong>Läkemedelshantering:</strong> Alla läkemedel ska förvaras säkert och endast hanteras av behörig personal enligt fastställda rutiner och kontrollistor.</li>
+                            <li><strong>Tolkservice:</strong> Professionella tolkar ska erbjudas vid behov, både fysiskt och digitalt. Minderåriga får inte användas som tolkar.</li>
+                            <li><strong>Patientsäkerhet:</strong> Alla avvikelser, felmedicineringar eller risker ska rapporteras i ett centralt system och analyseras för att förebygga framtida händelser.</li>
+                            <li><strong>Brand- och säkerhetsövningar:</strong> All personal ska genomföra brandövningar minst årligen. Rutiner för utrymning och kris hanteras i övningarna.</li>
+                            <li><strong>Utbildning:</strong> Nyanställda ska genomgå en obligatorisk introduktionsutbildning som inkluderar rutiner, säkerhet, värdegrund och patientsäkerhet.</li>
+                            <li><strong>Tillgänglighet:</strong> Alla lokaler ska vara anpassade för personer med fysisk eller kognitiv funktionsnedsättning. Detta inkluderar ramper, hissar och lättläst skyltning.</li>
+                            <li><strong>Kostpolicy:</strong> Måltider ska uppfylla näringsrekommendationer och specialkost (t.ex. diabetes, halal, allergi) ska alltid erbjudas.</li>
+                            <li><strong>IT-säkerhet:</strong> Alla system med patientuppgifter måste vara lösenordsskyddade, ha loggning och följa GDPR. Personal utbildas i datasäkerhet.</li>
+                            <li><strong>Psykosocial arbetsmiljö:</strong> Arbetsgivare ska förebygga stress och utbrändhet genom arbetsmiljöplaner, personalstöd och regelbunden uppföljning.</li>
+                            <li><strong>Tillsyn:</strong> Sjukhus och vårdcentraler ska granskas minst årligen genom intern eller extern tillsyn. Rapport ska publiceras offentligt.</li>
+                            <li><strong>Kvalitetsmål:</strong> Varje enhet ska sätta och följa upp mål för väntetider, vårdresultat och patientnöjdhet. Dessa ska redovisas öppet.</li>
+                            <li><strong>Nolltolerans mot våld:</strong> Hot, våld eller trakasserier mot personal eller patienter accepteras inte och polisanmäls alltid. Trygghetsrutiner ska finnas.</li>
+                            <li><strong>Tystnadsplikt:</strong> All personal ska känna till och följa regler om sekretess enligt patientdatalagen. Utbildning sker löpande.</li>
+                            <li><strong>Avskiljning och tvångsåtgärder:</strong> Sådana åtgärder får endast användas enligt lag och ska dokumenteras noggrant med skriftligt beslut.</li>
+                            <li><strong>Trygghetslarm:</strong> Alla patientrum ska ha fungerande larm som går direkt till vårdpersonal. Larmen kontrolleras dagligen.</li>
+                            <li><strong>Ersättning vid inställd vård:</strong> Om vårdbesök ställs in av sjukhuset har patienten rätt till ny tid inom rimlig tid och eventuell ersättning för resa.</li>
+                            <li><strong>Patientinflytande:</strong> Patienter ska ges möjlighet att delta i planeringen av sin vård, inklusive målformulering och val av behandlingsalternativ.</li>
+                            <li><strong>Klagomålshantering:</strong> Det ska finnas en lättillgänglig och tydlig process för att lämna klagomål. Alla klagomål ska besvaras skriftligt.</li>
+                            <li><strong>Vårdgaranti:</strong> Sjukhus och mottagningar ska följa vårdgarantin: kontakt inom 0 dagar, läkarkontakt inom 7 dagar, behandling inom 90.</li>
+                            <li><strong>Arbetstidsregler:</strong> Övertid ska minimeras och följa arbetsmiljölagen. Uppföljning sker av HR.</li>
+                            <li><strong>Rätt till andlig vård:</strong> Patienter ska informeras om rätten att få kontakt med religiösa företrädare vid behov.</li>
+                            <li><strong>Djurförbud (med undantag):</strong> Inga sällskapsdjur får vistas på vårdavdelningar, med undantag för godkända vårdhundar eller liknande.</li>
+                            <li><strong>Avdelningsrutiner:</strong> Varje avdelning ska ha skriftliga rutiner för inskrivning, utskrivning och daglig rapport. Dessa uppdateras årligen.</li>
+                            <li><strong>Utbildning i bemötande:</strong> Personalen ska regelbundet genomgå utbildning i bemötande, inklusive genus, etnicitet och HBTQ+.</li>
+                            <li><strong>Rätt till andra utlåtanden:</strong> Patienter har rätt att begära second opinion, som ska beviljas utan osakligt dröjsmål.</li>
+                            <li><strong>Städstandard:</strong> Städning ska ske dagligen enligt fastställda hygienkrav. Kontrolljournal ska föras.</li>
+                            <li><strong>Mottagning för unga:</strong> Ungdomar ska ha tillgång till särskilt anpassade mottagningar med fokus på psykisk och sexuell hälsa.</li>
+                            <li><strong>Återkoppling:</strong> Alla patienter ska kunna lämna anonym feedback efter vård. Resultatet används i förbättringsarbete.</li>
+                            <li><strong>Medicinteknisk utrustning:</strong> All utrustning som används i vården ska kontrolleras och kalibreras regelbundet. Fel ska rapporteras direkt.</li>
+                            <li><strong>Skyltning:</strong> Sjukhusmiljön ska ha tydlig skyltning på svenska och vid behov andra språk. Skyltar ska vara lätta att förstå och placerade logiskt.</li>
+                            <li><strong>Ronder och uppföljning:</strong> Regelbundna teamronder ska genomföras, där läkare, sjuksköterskor och annan personal planerar och följer upp vårdinsatserna.</li>
+                        </ul>
+                    `;
+                } else if (subtab === 'gdpr') {
+                    e.target.classList.add('bg-purple-700', 'text-white');
+                    e.target.classList.remove('bg-gray-200', 'text-gray-700');
+                    sjukvardImportantSubcontent.innerHTML = `
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">GDPR för Vårdinstanser</h4>
+                        <p class="text-gray-700">
+                            GDPR står för General Data Protection Regulation, eller på svenska Dataskyddsförordningen. Det är en lagstiftning som trädde i kraft inom EU den 25 maj 2018 och som har som syfte att stärka skyddet för personuppgifter och öka individers kontroll över sina egna data. GDPR gäller alla organisationer som hanterar personuppgifter inom EU, vilket inkluderar även vårdinstanser som sjukhus, vårdcentraler, tandvård, psykiatri och andra aktörer inom hälso- och sjukvården.
+                        </p>
+                        <h5 class="text-lg font-semibold text-gray-800 mt-4">Vad innebär GDPR för vårdinstanser?</h5>
+                        <p class="text-gray-700">
+                            Vårdinstanser arbetar med mycket känsliga personuppgifter, särskilt när det gäller patienters hälsa. Därför ställer GDPR särskilt höga krav på hur dessa uppgifter ska hanteras, skyddas och dokumenteras.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4 mt-2">
+                            <li><strong>Personuppgifter i vården:</strong> All information som direkt eller indirekt kan identifiera en person, inklusive hälsodata som är extra skyddsvärd.</li>
+                            <li><strong>Laglig grund för behandling:</strong> All behandling måste ha en laglig grund, oftast nödvändighet för att kunna ge vård eller uppfylla lagkrav.</li>
+                            <li><strong>Patientens rättigheter:</strong> Rätt till information, åtkomst, rättelse, begränsning av behandling, och i vissa fall radering eller dataportabilitet.</li>
+                            <li><strong>Säkerhet och sekretess:</strong> Tekniska och organisatoriska åtgärder för att skydda uppgifter mot obehörig åtkomst, förlust eller skada (t.ex. kryptering, behörighetskontroller, utbildning).</li>
+                            <li><strong>Dokumentation och ansvar:</strong> Vårdinstanser måste dokumentera sin personuppgiftsbehandling och kunna visa att de följer reglerna.</li>
+                            <li><strong>Meddelande om dataintrång:</strong> Incidenter med personuppgifter måste anmälas till Datainspektionen (IMY) inom 72 timmar, och i allvarliga fall ska patienter informeras.</li>
+                        </ul>
+                        <p class="text-gray-700 mt-4">
+                            Genom att följa GDPR stärker vårdinstanser patienternas förtroende och bidrar till en säker och etisk vårdverksamhet.
+                        </p>
+                    `;
+                }
+            });
+        });
+
+        function renderSjukvardJournal() {
+            sjukvardPatientList.innerHTML = '';
+            const nonAdminCharacters = characters.filter(char => char.role !== 'admin');
+            if (nonAdminCharacters.length === 0) {
+                sjukvardPatientList.innerHTML = '<p class="text-gray-500">Inga patienter att visa.</p>';
+                return;
+            }
+            nonAdminCharacters.forEach(char => {
+                const patientItem = document.createElement('div');
+                patientItem.classList.add('bg-white', 'p-3', 'rounded-lg', 'shadow-sm', 'border', 'border-gray-200');
+                patientItem.innerHTML = `
+                    <p class="font-semibold">${char.characterName}</p>
+                    <p class="text-sm text-gray-600">Personnummer: ${char.personalNumber}</p>
+                    <p class="text-sm text-gray-600">Discord: ${char.discordName || 'Ej angivet'}</p>
+                `;
+                sjukvardPatientList.appendChild(patientItem);
+            });
+        }
+
+
+        // Polis Modal
+        closePolisModalButton.addEventListener('click', () => { polisModal.style.display = 'none'; });
+        polisTabButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tab = e.target.dataset.tab;
+                polisTabButtons.forEach(btn => btn.classList.remove('active', 'bg-blue-700', 'text-white', 'bg-gray-200', 'text-gray-700'));
+                polisContentSections.forEach(section => section.classList.remove('active'));
+
+                e.target.classList.add('active', 'bg-blue-700', 'text-white');
+                e.target.classList.remove('bg-gray-200', 'text-gray-700');
+                document.getElementById(`polis-${tab}-content`).classList.add('active');
+            });
+        });
+
+        // Borgmästare Modal
+        closeBorgmastareModalButton.addEventListener('click', () => { borgmastareModal.style.display = 'none'; });
+        borgmastareTabButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tab = e.target.dataset.tab;
+                borgmastareTabButtons.forEach(btn => btn.classList.remove('active', 'bg-blue-700', 'text-white', 'bg-gray-200', 'text-gray-700'));
+                borgmastareContentSections.forEach(section => section.classList.remove('active'));
+
+                e.target.classList.add('active', 'bg-blue-700', 'text-white');
+                e.target.classList.remove('bg-gray-200', 'text-gray-700');
+                document.getElementById(`borgmastare-${tab}-content`).classList.add('active');
+            });
+        });
+
+        // Körskola Modal
+        closeKorskolaModalButton.addEventListener('click', () => { korskolaModal.style.display = 'none'; });
+        korskolaTabButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tab = e.target.dataset.tab;
+                korskolaTabButtons.forEach(btn => btn.classList.remove('active', 'bg-blue-700', 'text-white', 'bg-gray-200', 'text-gray-700'));
+                korskolaContentSections.forEach(section => section.classList.remove('active'));
+
+                e.target.classList.add('active', 'bg-blue-700', 'text-white');
+                e.target.classList.remove('bg-gray-200', 'text-gray-700');
+                document.getElementById(`korskola-${tab}-content`).classList.add('active');
+            });
+        });
+
+        // --- Bekräftelsemodal Logik ---
+        confirmDeleteButton.addEventListener('click', () => {
+            if (currentDeleteItem) {
+                if (currentDeleteItem.type === 'job') {
+                    jobListings = jobListings.filter(job => job.id !== currentDeleteItem.id);
+                    localStorage.setItem('algholmJobListings', JSON.stringify(jobListings));
+                    renderJobListings();
+                    showMessage('Jobbannons borttagen!', 'success');
+                } else if (currentDeleteItem.type === 'housing') {
+                    housingListings = housingListings.filter(house => house.id !== currentDeleteItem.id);
+                    localStorage.setItem('algholmHousingListings', JSON.stringify(housingListings));
+                    renderHousingListings();
+                    showMessage('Husannons borttagen!', 'success');
+                } else if (currentDeleteItem.type === 'rp-session') {
+                    rpSessions = rpSessions.filter(session => session.id !== currentDeleteItem.id);
+                    localStorage.setItem('algholmRPSessions', JSON.stringify(rpSessions));
+                    renderRPSessions();
+                    showMessage('RP-session borttagen!', 'success');
+                } else if (currentDeleteItem.type === 'news-article') {
+                    newsArticles = newsArticles.filter(article => article.id !== currentDeleteItem.id);
+                    localStorage.setItem('algholmNewsArticles', JSON.stringify(newsArticles));
+                    renderNewsArticles();
+                    showMessage('Nyhetsartikel borttagen!', 'success');
+                }
+            }
+            confirmationModal.style.display = 'none';
+            currentDeleteItem = null;
+        });
+
+        cancelDeleteButton.addEventListener('click', () => {
+            confirmationModal.style.display = 'none';
+            currentDeleteItem = null;
+        });
+
+        closeConfirmationModalButton.addEventListener('click', () => {
+            confirmationModal.style.display = 'none';
+            currentDeleteItem = null;
+        });
+
+
+        document.addEventListener('DOMContentLoaded', loadUserData);
+
+    </script>
+</body>
+</html>
